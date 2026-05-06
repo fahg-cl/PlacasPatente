@@ -1,0 +1,119 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Lector de Patentes</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 16px;
+            background: #f4f4f4;
+            text-align: center;
+        }
+
+        video, canvas {
+            width: 100%;
+            max-width: 420px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            background: #000;
+        }
+
+        button {
+            width: 100%;
+            max-width: 420px;
+            padding: 14px;
+            margin: 6px 0;
+            font-size: 16px;
+            border: none;
+            border-radius: 10px;
+            background: #0b5ed7;
+            color: white;
+        }
+
+        #resultado {
+            margin-top: 16px;
+            padding: 16px;
+            background: white;
+            border-radius: 12px;
+            font-size: 20px;
+            font-weight: bold;
+            min-height: 40px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>Lector básico de placa patente</h2>
+
+    <video id="video" autoplay playsinline></video>
+    <canvas id="canvas" style="display:none;"></canvas>
+
+    <button onclick="iniciarCamara()">Activar cámara</button>
+    <button onclick="capturarYLeer()">Capturar y leer patente</button>
+
+    <div id="resultado">Resultado...</div>
+
+    <script>
+    const video = document.getElementById("video");
+    const canvas = document.getElementById("canvas");
+    const resultado = document.getElementById("resultado");
+
+    async function iniciarCamara() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: "environment"
+          },
+          audio: false
+        });
+
+        video.srcObject = stream;
+      } catch (error) {
+        resultado.innerText = "No se pudo acceder a la cámara.";
+        console.error(error);
+      }
+    }
+
+    async function capturarYLeer() {
+      resultado.innerText = "Procesando imagen...";
+
+      const contexto = canvas.getContext("2d");
+
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+
+      contexto.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      const imagen = canvas.toDataURL("image/png");
+
+      try {
+        const lectura = await Tesseract.recognize(
+          imagen,
+          "eng",
+          {
+            logger: m => console.log(m)
+          }
+        );
+
+        let texto = lectura.data.text;
+
+        texto = texto
+          .toUpperCase()
+          .replace(/[^A-Z0-9]/g, "");
+
+        resultado.innerText = texto || "No se reconoció texto.";
+      } catch (error) {
+        resultado.innerText = "Error al procesar la imagen.";
+        console.error(error);
+      }
+    }
+    </script>
+
+</body>
+</html>

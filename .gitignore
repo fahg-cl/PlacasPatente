@@ -1,0 +1,8 @@
+﻿################################################################################
+# Este archivo .gitignore ha sido creado automáticamente por Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs/PlacasPatente/config
+/.vs/PlacasPatente/FileContentIndex
+/.vs/PlacasPatente/CopilotIndices/17.14.1641.39856
+/.vs
