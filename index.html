@@ -12,37 +12,77 @@
         body {
             font-family: Arial, sans-serif;
             background: #f4f4f4;
-            padding: 16px;
+            padding: 10px;
             text-align: center;
+            margin: 0;
         }
 
-        video, canvas {
+        h2, h3 {
+            margin: 8px 0;
+        }
+
+        video {
             width: 100%;
-            max-width: 420px;
+            max-width: 320px;
+            max-height: 220px;
+            object-fit: cover;
             border-radius: 12px;
             background: #000;
-            margin-bottom: 12px;
+        }
+
+        canvas {
+            width: 100%;
+            max-width: 320px;
+            border-radius: 12px;
+            background: #000;
+            margin-bottom: 8px;
         }
 
         button {
             width: 100%;
-            max-width: 420px;
-            padding: 14px;
-            margin: 6px 0;
+            max-width: 320px;
+            padding: 12px;
+            margin: 4px 0;
             border: none;
             border-radius: 10px;
             background: #0b5ed7;
             color: white;
-            font-size: 16px;
+            font-size: 15px;
         }
 
         #estado, #resultado {
-            max-width: 420px;
-            margin: 12px auto;
-            padding: 14px;
+            max-width: 320px;
+            margin: 8px auto;
+            padding: 10px;
             background: white;
             border-radius: 12px;
             font-weight: bold;
+            font-size: 14px;
+        }
+
+        .panel {
+            max-width: 420px;
+            margin: 8px auto;
+            padding: 10px;
+            background: white;
+            border-radius: 12px;
+            text-align: left;
+            font-size: 13px;
+        }
+
+        .registro {
+            border-bottom: 1px solid #ddd;
+            padding: 8px 0;
+        }
+
+            .registro:last-child {
+                border-bottom: none;
+            }
+
+        .patente {
+            font-size: 18px;
+            font-weight: bold;
+            color: #0b5ed7;
         }
     </style>
 </head>
@@ -53,8 +93,11 @@
 
     <video id="video" autoplay playsinline></video>
 
+    <br>
+
     <button onclick="iniciarCamara()">Activar cámara</button>
     <button onclick="capturarDetectarYLeer()">Capturar y leer patente</button>
+    <button onclick="limpiarHistorial()">Limpiar historial</button>
 
     <div id="estado">Cargando modelo...</div>
     <div id="resultado">Resultado...</div>
@@ -68,6 +111,11 @@
     <h3>Recorte patente</h3>
     <canvas id="canvasRecorte"></canvas>
 
+    <div class="panel">
+        <h3>Historial de sesión</h3>
+        <div id="historial">Sin registros.</div>
+    </div>
+
     <script>
     const video = document.getElementById("video");
     const canvasOriginal = document.getElementById("canvasOriginal");
@@ -76,48 +124,45 @@
     const canvasRecorte = document.getElementById("canvasRecorte");
     const estado = document.getElementById("estado");
     const resultado = document.getElementById("resultado");
+    const historialDiv = document.getElementById("historial");
 
     const MODEL_PATH = "./model/license_plate.onnx";
     const MODEL_SIZE = 640;
     const CONFIDENCE_THRESHOLD = 0.35;
 
     let session = null;
+    let historial = [];
 
     cargarModelo();
 
-async function cargarModelo() {
-  estado.innerText = "Cargando modelo YOLO...";
-  resultado.innerText = "Esperando carga del modelo.";
+    async function cargarModelo() {
+      estado.innerText = "Cargando modelo YOLO...";
+      resultado.innerText = "Esperando carga del modelo.";
 
-  try {
-    session = await ort.InferenceSession.create(MODEL_PATH, {
-      executionProviders: ["wasm"]
-    });
+      try {
+        session = await ort.InferenceSession.create(MODEL_PATH, {
+          executionProviders: ["wasm"]
+        });
 
-    console.log("Modelo cargado correctamente:", session);
-    console.log("Inputs:", session.inputNames);
-    console.log("Outputs:", session.outputNames);
+        estado.innerHTML = `
+          ✅ Modelo YOLO cargado correctamente.<br>
+          <small>Archivo: ${MODEL_PATH}</small><br>
+          <small>Input: ${session.inputNames[0]}</small><br>
+          <small>Output: ${session.outputNames[0]}</small>
+        `;
 
-    estado.innerHTML = `
-      ✅ Modelo YOLO cargado correctamente.<br>
-      <small>Archivo: ${MODEL_PATH}</small><br>
-      <small>Input: ${session.inputNames[0]}</small><br>
-      <small>Output: ${session.outputNames[0]}</small>
-    `;
+        resultado.innerText = "Modelo listo. Puedes activar la cámara.";
+      } catch (error) {
+        console.error("Error cargando modelo:", error);
 
-    resultado.innerText = "Modelo listo. Puedes activar la cámara.";
-  } catch (error) {
-    console.error("Error cargando modelo:", error);
+        estado.innerHTML = `
+          ❌ No se pudo cargar el modelo ONNX.<br>
+          <small>Revisa que exista: ${MODEL_PATH}</small>
+        `;
 
-    estado.innerHTML = `
-      ❌ No se pudo cargar el modelo ONNX.<br>
-      <small>Revisa que exista: ${MODEL_PATH}</small><br>
-      <small>Abre la consola del navegador para ver el error.</small>
-    `;
-
-    resultado.innerText = "Error al cargar el modelo.";
-  }
-}
+        resultado.innerText = "Error al cargar el modelo.";
+      }
+    }
 
     async function iniciarCamara() {
       try {
@@ -139,11 +184,10 @@ async function cargarModelo() {
     }
 
     async function capturarDetectarYLeer() {
-        if (!session) {
-          resultado.innerText = "El modelo YOLO aún no está cargado o falló la carga.";
-          estado.innerText = "Modelo no disponible.";
-          return;
-        }
+      if (!session) {
+        resultado.innerText = "El modelo YOLO aún no está cargado o falló la carga.";
+        return;
+      }
 
       if (!video.videoWidth || !video.videoHeight) {
         resultado.innerText = "Primero activa la cámara.";
@@ -186,11 +230,98 @@ async function cargarModelo() {
 
         const patente = extraerPatente(texto);
 
-        resultado.innerText = patente || "Texto detectado, pero no parece una patente válida.";
+        if (!patente) {
+          resultado.innerText = "Texto detectado, pero no parece una patente válida.";
+          return;
+        }
+
+        resultado.innerText = `Patente reconocida: ${patente}`;
+
+        await registrarLectura(patente);
+
       } catch (error) {
         resultado.innerText = "Error al leer el texto.";
         console.error(error);
       }
+    }
+
+    async function registrarLectura(patente) {
+      const fechaHora = new Date();
+
+      let ubicacion = {
+        latitud: null,
+        longitud: null,
+        precision: null,
+        disponible: false
+      };
+
+      try {
+        ubicacion = await obtenerUbicacion();
+      } catch (error) {
+        console.warn("No se pudo obtener ubicación:", error);
+      }
+
+      const registro = {
+        patente,
+        fechaHoraISO: fechaHora.toISOString(),
+        fechaHoraLocal: fechaHora.toLocaleString("es-CL"),
+        latitud: ubicacion.latitud,
+        longitud: ubicacion.longitud,
+        precision: ubicacion.precision,
+        ubicacionDisponible: ubicacion.disponible
+      };
+
+      historial.unshift(registro);
+      actualizarHistorial();
+    }
+
+    function obtenerUbicacion() {
+      return new Promise((resolve, reject) => {
+        if (!navigator.geolocation) {
+          reject("Geolocalización no soportada.");
+          return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+          position => {
+            resolve({
+              latitud: position.coords.latitude,
+              longitud: position.coords.longitude,
+              precision: position.coords.accuracy,
+              disponible: true
+            });
+          },
+          error => reject(error),
+          {
+            enableHighAccuracy: true,
+            timeout: 8000,
+            maximumAge: 0
+          }
+        );
+      });
+    }
+
+    function actualizarHistorial() {
+      if (historial.length === 0) {
+        historialDiv.innerHTML = "Sin registros.";
+        return;
+      }
+
+      historialDiv.innerHTML = historial.map((r, index) => `
+        <div class="registro">
+          <div class="patente">${index + 1}. ${r.patente}</div>
+          <div><strong>Fecha/Hora:</strong> ${r.fechaHoraLocal}</div>
+          <div><strong>Latitud:</strong> ${r.latitud ?? "No disponible"}</div>
+          <div><strong>Longitud:</strong> ${r.longitud ?? "No disponible"}</div>
+          <div><strong>Precisión:</strong> ${r.precision ? Math.round(r.precision) + " metros" : "No disponible"}</div>
+        </div>
+      `).join("");
+    }
+
+    function limpiarHistorial() {
+      historial = [];
+      actualizarHistorial();
+      resultado.innerText = "Historial limpiado.";
     }
 
     async function detectarPatenteYOLO(canvas) {
@@ -235,15 +366,6 @@ async function cargarModelo() {
     function procesarSalidaYOLO(output, originalWidth, originalHeight) {
       const data = output.data;
       const dims = output.dims;
-
-      /*
-        Este bloque asume salida tipo YOLO:
-        [1, 5, 8400] o similar:
-        x, y, width, height, confidence
-
-        Algunos modelos exportados pueden devolver otra estructura.
-        Si tu modelo entrega [1, 8400, 5], habría que ajustar este parser.
-      */
 
       let mejor = null;
       let mejorConfianza = 0;
