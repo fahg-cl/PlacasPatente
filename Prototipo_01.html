@@ -1,0 +1,300 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Lector automático de patentes</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <script async src="https://docs.opencv.org/4.x/opencv.js" onload="opencvListo()"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 16px;
+            background: #f4f4f4;
+            text-align: center;
+        }
+
+        video, canvas {
+            width: 100%;
+            max-width: 420px;
+            border-radius: 12px;
+            background: #000;
+            margin-bottom: 12px;
+        }
+
+        button {
+            width: 100%;
+            max-width: 420px;
+            padding: 14px;
+            margin: 6px 0;
+            font-size: 16px;
+            border: none;
+            border-radius: 10px;
+            background: #0b5ed7;
+            color: white;
+        }
+
+        #resultado, #estado {
+            margin: 12px auto;
+            padding: 14px;
+            max-width: 420px;
+            background: white;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        #previewRecorte {
+            border: 2px solid #0b5ed7;
+            background: white;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>Lector automático de patente</h2>
+
+    <video id="video" autoplay playsinline></video>
+
+    <button onclick="iniciarCamara()">Activar cámara</button>
+    <button onclick="capturarDetectarYLeer()">Capturar y leer patente</button>
+
+    <div id="estado">Cargando OpenCV...</div>
+    <div id="resultado">Resultado...</div>
+
+    <canvas id="canvasOriginal" style="display:none;"></canvas>
+    <canvas id="canvasRecorte" style="display:none;"></canvas>
+
+    <h3>Recorte detectado</h3>
+    <canvas id="previewRecorte"></canvas>
+
+    <script>
+    const video = document.getElementById("video");
+    const canvasOriginal = document.getElementById("canvasOriginal");
+    const canvasRecorte = document.getElementById("canvasRecorte");
+    const previewRecorte = document.getElementById("previewRecorte");
+    const resultado = document.getElementById("resultado");
+    const estado = document.getElementById("estado");
+
+    let cvDisponible = false;
+
+    function opencvListo() {
+      cv["onRuntimeInitialized"] = () => {
+        cvDisponible = true;
+        estado.innerText = "OpenCV listo.";
+      };
+    }
+
+    async function iniciarCamara() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: "environment",
+            width: { ideal: 1280 },
+            height: { ideal: 720 }
+          },
+          audio: false
+        });
+
+        video.srcObject = stream;
+        resultado.innerText = "Cámara activa.";
+      } catch (error) {
+        resultado.innerText = "No se pudo acceder a la cámara.";
+        console.error(error);
+      }
+    }
+
+    async function capturarDetectarYLeer() {
+      if (!cvDisponible) {
+        resultado.innerText = "OpenCV aún no está listo.";
+        return;
+      }
+
+      if (!video.videoWidth || !video.videoHeight) {
+        resultado.innerText = "Primero activa la cámara.";
+        return;
+      }
+
+      resultado.innerText = "Detectando patente...";
+
+      const ctx = canvasOriginal.getContext("2d");
+
+      canvasOriginal.width = video.videoWidth;
+      canvasOriginal.height = video.videoHeight;
+
+      ctx.drawImage(video, 0, 0, canvasOriginal.width, canvasOriginal.height);
+
+      const rect = detectarPatente(canvasOriginal);
+
+      if (!rect) {
+        resultado.innerText = "No se detectó una zona probable de patente.";
+        return;
+      }
+
+      const recorte = recortarImagen(canvasOriginal, rect);
+
+      mostrarPreview(recorte);
+
+      resultado.innerText = "Leyendo texto...";
+
+      const imagen = canvasRecorte.toDataURL("image/png");
+
+      try {
+        const lectura = await Tesseract.recognize(
+          imagen,
+          "eng",
+          {
+            tessedit_char_whitelist: "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+            logger: m => console.log(m)
+          }
+        );
+
+        let texto = lectura.data.text
+          .toUpperCase()
+          .replace(/[^A-Z0-9]/g, "");
+
+        const patente = extraerPatente(texto);
+
+        resultado.innerText = patente || "No se reconoció una patente válida.";
+      } catch (error) {
+        resultado.innerText = "Error al leer la patente.";
+        console.error(error);
+      }
+    }
+
+    function detectarPatente(canvas) {
+      let src = cv.imread(canvas);
+      let gray = new cv.Mat();
+      let blurred = new cv.Mat();
+      let edged = new cv.Mat();
+      let contours = new cv.MatVector();
+      let hierarchy = new cv.Mat();
+
+      cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
+      cv.GaussianBlur(gray, blurred, new cv.Size(5, 5), 0);
+      cv.Canny(blurred, edged, 80, 200);
+
+      cv.findContours(
+        edged,
+        contours,
+        hierarchy,
+        cv.RETR_EXTERNAL,
+        cv.CHAIN_APPROX_SIMPLE
+      );
+
+      let mejorRect = null;
+      let mejorScore = 0;
+
+      for (let i = 0; i < contours.size(); i++) {
+        const contour = contours.get(i);
+        const rect = cv.boundingRect(contour);
+
+        const aspectRatio = rect.width / rect.height;
+        const area = rect.width * rect.height;
+        const areaImagen = canvas.width * canvas.height;
+
+        /*
+          Patentes chilenas suelen ser rectangulares y horizontales.
+          Ajusta estos valores si tu cámara queda muy cerca o muy lejos.
+        */
+        const esHorizontal = aspectRatio >= 2.0 && aspectRatio <= 6.5;
+        const areaValida = area > areaImagen * 0.005 && area < areaImagen * 0.30;
+        const anchoValido = rect.width > canvas.width * 0.15;
+        const altoValido = rect.height > canvas.height * 0.03;
+
+        if (esHorizontal && areaValida && anchoValido && altoValido) {
+          const score = area;
+
+          if (score > mejorScore) {
+            mejorScore = score;
+            mejorRect = rect;
+          }
+        }
+
+        contour.delete();
+      }
+
+      src.delete();
+      gray.delete();
+      blurred.delete();
+      edged.delete();
+      contours.delete();
+      hierarchy.delete();
+
+      return mejorRect;
+    }
+
+    function recortarImagen(canvas, rect) {
+      const margen = 12;
+
+      const x = Math.max(rect.x - margen, 0);
+      const y = Math.max(rect.y - margen, 0);
+      const width = Math.min(rect.width + margen * 2, canvas.width - x);
+      const height = Math.min(rect.height + margen * 2, canvas.height - y);
+
+      canvasRecorte.width = width;
+      canvasRecorte.height = height;
+
+      const ctx = canvasRecorte.getContext("2d");
+
+      ctx.drawImage(
+        canvas,
+        x,
+        y,
+        width,
+        height,
+        0,
+        0,
+        width,
+        height
+      );
+
+      mejorarImagenParaOCR(ctx, width, height);
+
+      return canvasRecorte;
+    }
+
+    function mejorarImagenParaOCR(ctx, width, height) {
+      const imageData = ctx.getImageData(0, 0, width, height);
+      const data = imageData.data;
+
+      for (let i = 0; i < data.length; i += 4) {
+        const gris = data[i] * 0.3 + data[i + 1] * 0.59 + data[i + 2] * 0.11;
+        const valor = gris > 130 ? 255 : 0;
+
+        data[i] = valor;
+        data[i + 1] = valor;
+        data[i + 2] = valor;
+      }
+
+      ctx.putImageData(imageData, 0, 0);
+    }
+
+    function mostrarPreview(canvas) {
+      previewRecorte.width = canvas.width;
+      previewRecorte.height = canvas.height;
+
+      const ctx = previewRecorte.getContext("2d");
+      ctx.drawImage(canvas, 0, 0);
+    }
+
+    function extraerPatente(texto) {
+      const patrones = [
+        /[A-Z]{4}[0-9]{2}/,
+        /[A-Z]{2}[0-9]{4}/
+      ];
+
+      for (const patron of patrones) {
+        const match = texto.match(patron);
+        if (match) return match[0];
+      }
+
+      return null;
+    }
+    </script>
+
+</body>
+</html>
