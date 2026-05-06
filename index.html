@@ -78,7 +78,15 @@
             .registro:last-child {
                 border-bottom: none;
             }
-
+        select {
+            width: 100%;
+            max-width: 320px;
+            padding: 12px;
+            margin: 4px 0;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            font-size: 15px;
+        }
         .patente {
             font-size: 18px;
             font-weight: bold;
@@ -97,7 +105,18 @@
 
     <button onclick="iniciarCamara()">Activar cámara</button>
     <button onclick="capturarDetectarYLeer()">Capturar y leer patente</button>
-    <button onclick="limpiarHistorial()">Limpiar historial</button>
+    <select id="intervaloCaptura">
+        <option value="5000">Cada 5 segundos</option>
+        <option value="10000">Cada 10 segundos</option>
+        <option value="15000">Cada 15 segundos</option>
+        <option value="20000">Cada 20 segundos</option>
+        <option value="30000">Cada 30 segundos</option>
+        <option value="60000">Cada 60 segundos</option>
+    </select>
+
+    <button onclick="iniciarCapturaAutomatica()">Iniciar captura automática</button>
+    <button onclick="detenerCapturaAutomatica()">Detener captura automática</button>
+    <button onclick="borrarHistoria()">Borrar historia</button>
 
     <div id="estado">Cargando modelo...</div>
     <div id="resultado">Resultado...</div>
@@ -131,7 +150,11 @@
     const CONFIDENCE_THRESHOLD = 0.35;
 
     let session = null;
-    let historial = [];
+    const STORAGE_KEY = "historial_patentes_yolo";
+    let historial = cargarHistorialDesdeLocalStorage();
+    let capturaAutomaticaTimer = null;
+
+    actualizarHistorial();
 
     cargarModelo();
 
@@ -262,6 +285,7 @@
       }
 
       const registro = {
+        id: crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(),
         patente,
         fechaHoraISO: fechaHora.toISOString(),
         fechaHoraLocal: fechaHora.toLocaleString("es-CL"),
@@ -272,6 +296,7 @@
       };
 
       historial.unshift(registro);
+      guardarHistorialEnLocalStorage();
       actualizarHistorial();
     }
 
@@ -301,22 +326,22 @@
       });
     }
 
-    function actualizarHistorial() {
-      if (historial.length === 0) {
-        historialDiv.innerHTML = "Sin registros.";
-        return;
-      }
+function actualizarHistorial() {
+  if (historial.length === 0) {
+    historialDiv.innerHTML = "Sin registros.";
+    return;
+  }
 
-      historialDiv.innerHTML = historial.map((r, index) => `
-        <div class="registro">
-          <div class="patente">${index + 1}. ${r.patente}</div>
-          <div><strong>Fecha/Hora:</strong> ${r.fechaHoraLocal}</div>
-          <div><strong>Latitud:</strong> ${r.latitud ?? "No disponible"}</div>
-          <div><strong>Longitud:</strong> ${r.longitud ?? "No disponible"}</div>
-          <div><strong>Precisión:</strong> ${r.precision ? Math.round(r.precision) + " metros" : "No disponible"}</div>
-        </div>
-      `).join("");
-    }
+  historialDiv.innerHTML = historial.map((r, index) => `
+    <div class="registro">
+      <div class="patente">${index + 1}. ${r.patente}</div>
+      <div><strong>Fecha/Hora:</strong> ${r.fechaHoraLocal}</div>
+      <div><strong>Latitud:</strong> ${r.latitud ?? "No disponible"}</div>
+      <div><strong>Longitud:</strong> ${r.longitud ?? "No disponible"}</div>
+      <div><strong>Precisión:</strong> ${r.precision ? Math.round(r.precision) + " metros" : "No disponible"}</div>
+    </div>
+  `).join("");
+}
 
     function limpiarHistorial() {
       historial = [];
@@ -475,6 +500,54 @@
 
       return null;
     }
+
+    function guardarHistorialEnLocalStorage() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(historial));
+}
+
+function cargarHistorialDesdeLocalStorage() {
+  try {
+    const data = localStorage.getItem(STORAGE_KEY);
+    return data ? JSON.parse(data) : [];
+  } catch (error) {
+    console.error("Error leyendo localStorage:", error);
+    return [];
+  }
+}
+
+function borrarHistoria() {
+  historial = [];
+  localStorage.removeItem(STORAGE_KEY);
+  actualizarHistorial();
+  resultado.innerText = "Historia borrada.";
+}
+
+function iniciarCapturaAutomatica() {
+  if (capturaAutomaticaTimer) {
+    resultado.innerText = "La captura automática ya está activa.";
+    return;
+  }
+
+  const intervalo = Number(document.getElementById("intervaloCaptura").value);
+
+  resultado.innerText = `Captura automática iniciada cada ${intervalo / 1000} segundos.`;
+
+  capturarDetectarYLeer();
+
+  capturaAutomaticaTimer = setInterval(() => {
+    capturarDetectarYLeer();
+  }, intervalo);
+}
+
+function detenerCapturaAutomatica() {
+  if (capturaAutomaticaTimer) {
+    clearInterval(capturaAutomaticaTimer);
+    capturaAutomaticaTimer = null;
+    resultado.innerText = "Captura automática detenida.";
+  } else {
+    resultado.innerText = "La captura automática no está activa.";
+  }
+}
     </script>
 
 </body>
