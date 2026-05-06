@@ -1,0 +1,359 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>Lector YOLO de Patentes</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            padding: 16px;
+            text-align: center;
+        }
+
+        video, canvas {
+            width: 100%;
+            max-width: 420px;
+            border-radius: 12px;
+            background: #000;
+            margin-bottom: 12px;
+        }
+
+        button {
+            width: 100%;
+            max-width: 420px;
+            padding: 14px;
+            margin: 6px 0;
+            border: none;
+            border-radius: 10px;
+            background: #0b5ed7;
+            color: white;
+            font-size: 16px;
+        }
+
+        #estado, #resultado {
+            max-width: 420px;
+            margin: 12px auto;
+            padding: 14px;
+            background: white;
+            border-radius: 12px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>Lector de Patentes con YOLO</h2>
+
+    <video id="video" autoplay playsinline></video>
+
+    <button onclick="iniciarCamara()">Activar cámara</button>
+    <button onclick="capturarDetectarYLeer()">Capturar y leer patente</button>
+
+    <div id="estado">Cargando modelo...</div>
+    <div id="resultado">Resultado...</div>
+
+    <canvas id="canvasOriginal" style="display:none;"></canvas>
+    <canvas id="canvasModelo" style="display:none;"></canvas>
+
+    <h3>Detección</h3>
+    <canvas id="canvasPreview"></canvas>
+
+    <h3>Recorte patente</h3>
+    <canvas id="canvasRecorte"></canvas>
+
+    <script>
+    const video = document.getElementById("video");
+    const canvasOriginal = document.getElementById("canvasOriginal");
+    const canvasModelo = document.getElementById("canvasModelo");
+    const canvasPreview = document.getElementById("canvasPreview");
+    const canvasRecorte = document.getElementById("canvasRecorte");
+    const estado = document.getElementById("estado");
+    const resultado = document.getElementById("resultado");
+
+    const MODEL_PATH = "./model/license_plate.onnx";
+    const MODEL_SIZE = 640;
+    const CONFIDENCE_THRESHOLD = 0.35;
+
+    let session = null;
+
+    cargarModelo();
+
+async function cargarModelo() {
+  estado.innerText = "Cargando modelo YOLO...";
+  resultado.innerText = "Esperando carga del modelo.";
+
+  try {
+    session = await ort.InferenceSession.create(MODEL_PATH, {
+      executionProviders: ["wasm"]
+    });
+
+    console.log("Modelo cargado correctamente:", session);
+    console.log("Inputs:", session.inputNames);
+    console.log("Outputs:", session.outputNames);
+
+    estado.innerHTML = `
+      ✅ Modelo YOLO cargado correctamente.<br>
+      <small>Archivo: ${MODEL_PATH}</small><br>
+      <small>Input: ${session.inputNames[0]}</small><br>
+      <small>Output: ${session.outputNames[0]}</small>
+    `;
+
+    resultado.innerText = "Modelo listo. Puedes activar la cámara.";
+  } catch (error) {
+    console.error("Error cargando modelo:", error);
+
+    estado.innerHTML = `
+      ❌ No se pudo cargar el modelo ONNX.<br>
+      <small>Revisa que exista: ${MODEL_PATH}</small><br>
+      <small>Abre la consola del navegador para ver el error.</small>
+    `;
+
+    resultado.innerText = "Error al cargar el modelo.";
+  }
+}
+
+    async function iniciarCamara() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: "environment",
+            width: { ideal: 1280 },
+            height: { ideal: 720 }
+          },
+          audio: false
+        });
+
+        video.srcObject = stream;
+        resultado.innerText = "Cámara activa.";
+      } catch (error) {
+        resultado.innerText = "No se pudo acceder a la cámara.";
+        console.error(error);
+      }
+    }
+
+    async function capturarDetectarYLeer() {
+        if (!session) {
+          resultado.innerText = "El modelo YOLO aún no está cargado o falló la carga.";
+          estado.innerText = "Modelo no disponible.";
+          return;
+        }
+
+      if (!video.videoWidth || !video.videoHeight) {
+        resultado.innerText = "Primero activa la cámara.";
+        return;
+      }
+
+      resultado.innerText = "Detectando patente...";
+
+      const ctx = canvasOriginal.getContext("2d");
+      canvasOriginal.width = video.videoWidth;
+      canvasOriginal.height = video.videoHeight;
+      ctx.drawImage(video, 0, 0, canvasOriginal.width, canvasOriginal.height);
+
+      const deteccion = await detectarPatenteYOLO(canvasOriginal);
+
+      if (!deteccion) {
+        resultado.innerText = "No se detectó una patente.";
+        return;
+      }
+
+      dibujarDeteccion(canvasOriginal, deteccion);
+      recortarPatente(canvasOriginal, deteccion);
+
+      resultado.innerText = "Leyendo patente...";
+
+      const imagenRecorte = canvasRecorte.toDataURL("image/png");
+
+      try {
+        const lectura = await Tesseract.recognize(
+          imagenRecorte,
+          "eng",
+          {
+            tessedit_char_whitelist: "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+          }
+        );
+
+        const texto = lectura.data.text
+          .toUpperCase()
+          .replace(/[^A-Z0-9]/g, "");
+
+        const patente = extraerPatente(texto);
+
+        resultado.innerText = patente || "Texto detectado, pero no parece una patente válida.";
+      } catch (error) {
+        resultado.innerText = "Error al leer el texto.";
+        console.error(error);
+      }
+    }
+
+    async function detectarPatenteYOLO(canvas) {
+      const inputTensor = prepararImagenParaYOLO(canvas);
+
+      const inputName = session.inputNames[0];
+      const outputs = await session.run({
+        [inputName]: inputTensor
+      });
+
+      const outputName = session.outputNames[0];
+      const output = outputs[outputName];
+
+      return procesarSalidaYOLO(output, canvas.width, canvas.height);
+    }
+
+    function prepararImagenParaYOLO(canvas) {
+      canvasModelo.width = MODEL_SIZE;
+      canvasModelo.height = MODEL_SIZE;
+
+      const ctx = canvasModelo.getContext("2d");
+      ctx.drawImage(canvas, 0, 0, MODEL_SIZE, MODEL_SIZE);
+
+      const imageData = ctx.getImageData(0, 0, MODEL_SIZE, MODEL_SIZE);
+      const data = imageData.data;
+
+      const red = [];
+      const green = [];
+      const blue = [];
+
+      for (let i = 0; i < data.length; i += 4) {
+        red.push(data[i] / 255);
+        green.push(data[i + 1] / 255);
+        blue.push(data[i + 2] / 255);
+      }
+
+      const input = new Float32Array([...red, ...green, ...blue]);
+
+      return new ort.Tensor("float32", input, [1, 3, MODEL_SIZE, MODEL_SIZE]);
+    }
+
+    function procesarSalidaYOLO(output, originalWidth, originalHeight) {
+      const data = output.data;
+      const dims = output.dims;
+
+      /*
+        Este bloque asume salida tipo YOLO:
+        [1, 5, 8400] o similar:
+        x, y, width, height, confidence
+
+        Algunos modelos exportados pueden devolver otra estructura.
+        Si tu modelo entrega [1, 8400, 5], habría que ajustar este parser.
+      */
+
+      let mejor = null;
+      let mejorConfianza = 0;
+
+      const cantidad = dims[2] || dims[1];
+
+      for (let i = 0; i < cantidad; i++) {
+        const x = data[i];
+        const y = data[cantidad + i];
+        const w = data[cantidad * 2 + i];
+        const h = data[cantidad * 3 + i];
+        const confianza = data[cantidad * 4 + i];
+
+        if (confianza > CONFIDENCE_THRESHOLD && confianza > mejorConfianza) {
+          mejorConfianza = confianza;
+
+          const escalaX = originalWidth / MODEL_SIZE;
+          const escalaY = originalHeight / MODEL_SIZE;
+
+          mejor = {
+            x: (x - w / 2) * escalaX,
+            y: (y - h / 2) * escalaY,
+            width: w * escalaX,
+            height: h * escalaY,
+            confidence: confianza
+          };
+        }
+      }
+
+      return mejor;
+    }
+
+    function dibujarDeteccion(canvas, rect) {
+      canvasPreview.width = canvas.width;
+      canvasPreview.height = canvas.height;
+
+      const ctx = canvasPreview.getContext("2d");
+      ctx.drawImage(canvas, 0, 0);
+
+      ctx.lineWidth = 6;
+      ctx.strokeStyle = "lime";
+      ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
+
+      ctx.font = "28px Arial";
+      ctx.fillStyle = "lime";
+      ctx.fillText(
+        `Patente ${(rect.confidence * 100).toFixed(1)}%`,
+        rect.x,
+        Math.max(rect.y - 10, 30)
+      );
+    }
+
+    function recortarPatente(canvas, rect) {
+      const margen = 16;
+
+      const x = Math.max(rect.x - margen, 0);
+      const y = Math.max(rect.y - margen, 0);
+      const width = Math.min(rect.width + margen * 2, canvas.width - x);
+      const height = Math.min(rect.height + margen * 2, canvas.height - y);
+
+      canvasRecorte.width = width;
+      canvasRecorte.height = height;
+
+      const ctx = canvasRecorte.getContext("2d");
+
+      ctx.drawImage(
+        canvas,
+        x,
+        y,
+        width,
+        height,
+        0,
+        0,
+        width,
+        height
+      );
+
+      mejorarImagenOCR(ctx, width, height);
+    }
+
+    function mejorarImagenOCR(ctx, width, height) {
+      const imageData = ctx.getImageData(0, 0, width, height);
+      const data = imageData.data;
+
+      for (let i = 0; i < data.length; i += 4) {
+        const gris = data[i] * 0.3 + data[i + 1] * 0.59 + data[i + 2] * 0.11;
+        const valor = gris > 130 ? 255 : 0;
+
+        data[i] = valor;
+        data[i + 1] = valor;
+        data[i + 2] = valor;
+      }
+
+      ctx.putImageData(imageData, 0, 0);
+    }
+
+    function extraerPatente(texto) {
+      const patrones = [
+        /[A-Z]{4}[0-9]{2}/,
+        /[A-Z]{2}[0-9]{4}/
+      ];
+
+      for (const patron of patrones) {
+        const match = texto.match(patron);
+        if (match) return match[0];
+      }
+
+      return null;
+    }
+    </script>
+
+</body>
+</html>
