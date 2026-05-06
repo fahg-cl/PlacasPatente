@@ -1,9 +1,9 @@
 ﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>Lector de Patentes</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
@@ -15,19 +15,52 @@
             text-align: center;
         }
 
-        video, canvas {
+        .camera-box {
+            position: relative;
             width: 100%;
             max-width: 420px;
+            margin: auto;
             border-radius: 12px;
-            margin-bottom: 12px;
+            overflow: hidden;
             background: #000;
+        }
+
+        video {
+            width: 100%;
+            display: block;
+        }
+
+        .plate-frame {
+            position: absolute;
+            left: 10%;
+            top: 40%;
+            width: 80%;
+            height: 20%;
+            border: 3px solid #00ff66;
+            border-radius: 10px;
+            box-sizing: border-box;
+            box-shadow: 0 0 0 9999px rgba(0,0,0,0.45);
+        }
+
+        .hint {
+            position: absolute;
+            top: calc(40% + 22%);
+            left: 0;
+            width: 100%;
+            color: white;
+            font-size: 14px;
+            text-shadow: 1px 1px 3px black;
+        }
+
+        canvas {
+            display: none;
         }
 
         button {
             width: 100%;
             max-width: 420px;
             padding: 14px;
-            margin: 6px 0;
+            margin: 8px 0;
             font-size: 16px;
             border: none;
             border-radius: 10px;
@@ -36,11 +69,12 @@
         }
 
         #resultado {
-            margin-top: 16px;
+            margin: 16px auto;
             padding: 16px;
+            max-width: 420px;
             background: white;
             border-radius: 12px;
-            font-size: 20px;
+            font-size: 22px;
             font-weight: bold;
             min-height: 40px;
         }
@@ -51,8 +85,13 @@
 
     <h2>Lector básico de placa patente</h2>
 
-    <video id="video" autoplay playsinline></video>
-    <canvas id="canvas" style="display:none;"></canvas>
+    <div class="camera-box">
+        <video id="video" autoplay playsinline></video>
+        <div class="plate-frame"></div>
+        <div class="hint">Alinea la patente dentro del recuadro</div>
+    </div>
+
+    <canvas id="canvas"></canvas>
 
     <button onclick="iniciarCamara()">Activar cámara</button>
     <button onclick="capturarYLeer()">Capturar y leer patente</button>
@@ -68,7 +107,9 @@
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
           video: {
-            facingMode: "environment"
+            facingMode: "environment",
+            width: { ideal: 1280 },
+            height: { ideal: 720 }
           },
           audio: false
         });
@@ -81,14 +122,42 @@
     }
 
     async function capturarYLeer() {
-      resultado.innerText = "Procesando imagen...";
+      resultado.innerText = "Procesando patente...";
 
       const contexto = canvas.getContext("2d");
 
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
+      const videoWidth = video.videoWidth;
+      const videoHeight = video.videoHeight;
 
-      contexto.drawImage(video, 0, 0, canvas.width, canvas.height);
+      /*
+        Recorte equivalente al marco visual:
+        left: 10%
+        top: 40%
+        width: 80%
+        height: 20%
+      */
+
+      const cropX = videoWidth * 0.10;
+      const cropY = videoHeight * 0.40;
+      const cropWidth = videoWidth * 0.80;
+      const cropHeight = videoHeight * 0.20;
+
+      canvas.width = cropWidth;
+      canvas.height = cropHeight;
+
+      contexto.drawImage(
+        video,
+        cropX,
+        cropY,
+        cropWidth,
+        cropHeight,
+        0,
+        0,
+        cropWidth,
+        cropHeight
+      );
+
+      mejorarImagen(contexto, canvas.width, canvas.height);
 
       const imagen = canvas.toDataURL("image/png");
 
@@ -97,21 +166,53 @@
           imagen,
           "eng",
           {
+            tessedit_char_whitelist: "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
             logger: m => console.log(m)
           }
         );
 
-        let texto = lectura.data.text;
-
-        texto = texto
+        let texto = lectura.data.text
           .toUpperCase()
           .replace(/[^A-Z0-9]/g, "");
 
-        resultado.innerText = texto || "No se reconoció texto.";
+        const patente = extraerPatente(texto);
+
+        resultado.innerText = patente || "No se reconoció una patente válida.";
       } catch (error) {
         resultado.innerText = "Error al procesar la imagen.";
         console.error(error);
       }
+    }
+
+    function mejorarImagen(ctx, width, height) {
+      const imageData = ctx.getImageData(0, 0, width, height);
+      const data = imageData.data;
+
+      for (let i = 0; i < data.length; i += 4) {
+        const gris = data[i] * 0.3 + data[i + 1] * 0.59 + data[i + 2] * 0.11;
+
+        const contraste = gris > 140 ? 255 : 0;
+
+        data[i] = contraste;
+        data[i + 1] = contraste;
+        data[i + 2] = contraste;
+      }
+
+      ctx.putImageData(imageData, 0, 0);
+    }
+
+    function extraerPatente(texto) {
+      const patrones = [
+        /[A-Z]{4}[0-9]{2}/,
+        /[A-Z]{2}[0-9]{4}/
+      ];
+
+      for (const patron of patrones) {
+        const resultado = texto.match(patron);
+        if (resultado) return resultado[0];
+      }
+
+      return null;
     }
     </script>
 
