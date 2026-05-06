@@ -85,18 +85,39 @@
 
     cargarModelo();
 
-    async function cargarModelo() {
-      try {
-        session = await ort.InferenceSession.create(MODEL_PATH, {
-          executionProviders: ["wasm"]
-        });
+async function cargarModelo() {
+  estado.innerText = "Cargando modelo YOLO...";
+  resultado.innerText = "Esperando carga del modelo.";
 
-        estado.innerText = "Modelo YOLO cargado.";
-      } catch (error) {
-        estado.innerText = "No se pudo cargar el modelo ONNX.";
-        console.error(error);
-      }
-    }
+  try {
+    session = await ort.InferenceSession.create(MODEL_PATH, {
+      executionProviders: ["wasm"]
+    });
+
+    console.log("Modelo cargado correctamente:", session);
+    console.log("Inputs:", session.inputNames);
+    console.log("Outputs:", session.outputNames);
+
+    estado.innerHTML = `
+      ✅ Modelo YOLO cargado correctamente.<br>
+      <small>Archivo: ${MODEL_PATH}</small><br>
+      <small>Input: ${session.inputNames[0]}</small><br>
+      <small>Output: ${session.outputNames[0]}</small>
+    `;
+
+    resultado.innerText = "Modelo listo. Puedes activar la cámara.";
+  } catch (error) {
+    console.error("Error cargando modelo:", error);
+
+    estado.innerHTML = `
+      ❌ No se pudo cargar el modelo ONNX.<br>
+      <small>Revisa que exista: ${MODEL_PATH}</small><br>
+      <small>Abre la consola del navegador para ver el error.</small>
+    `;
+
+    resultado.innerText = "Error al cargar el modelo.";
+  }
+}
 
     async function iniciarCamara() {
       try {
@@ -118,10 +139,11 @@
     }
 
     async function capturarDetectarYLeer() {
-      if (!session) {
-        resultado.innerText = "El modelo aún no está cargado.";
-        return;
-      }
+        if (!session) {
+          resultado.innerText = "El modelo YOLO aún no está cargado o falló la carga.";
+          estado.innerText = "Modelo no disponible.";
+          return;
+        }
 
       if (!video.videoWidth || !video.videoHeight) {
         resultado.innerText = "Primero activa la cámara.";
