@@ -1,176 +1,192 @@
 ﻿<!DOCTYPE html>
 <html lang="es">
+
 <head>
-    <meta charset="UTF-8" />
-    <title>Lector YOLO de Patentes</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8" />
+  <title>Lector YOLO de Patentes</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f4f4f4;
-            padding: 10px;
-            text-align: center;
-            margin: 0;
-        }
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      padding: 4px;
+      text-align: center;
+      margin: 0;
+    }
 
-        h2, h3 {
-            margin: 8px 0;
-        }
-        .preview-container {
-          display: flex;
-          gap: 8px;
-          justify-content: center;
-          align-items: flex-start;
-          flex-wrap: nowrap;
-          max-width: 420px;
-          margin: auto;
-        }
+    h2,
+    h3 {
+      margin: 8px 0;
+    }
 
-        .preview-box {
-          flex: 1;
-          min-width: 0;
-        }
+    .preview-container {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      align-items: flex-start;
+      flex-wrap: nowrap;
+      max-width: 100%;
+      margin: auto;
+    }
 
-        .preview-box h3 {
-          font-size: 13px;
-          margin: 4px 0;
-        }
+    .control-grid {
+      max-width: 100%;
+      margin: 8px auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
 
-        .preview-box canvas {
-          width: 100%;
-          max-width: 180px;
-          max-height: 140px;
-          object-fit: contain;
-          border-radius: 10px;
-          background: #000;
-        }
-                video {
-            width: 100%;
-            max-width: 320px;
-            max-height: 220px;
-            object-fit: cover;
-            border-radius: 12px;
-            background: #000;
-        }
+    .control-grid button,
+    .control-grid select {
+      width: 100%;
+      padding: 11px 8px;
+      border-radius: 10px;
+      font-size: 13px;
+      box-sizing: border-box;
+    }
 
-        canvas {
-            width: 100%;
-            max-width: 320px;
-            border-radius: 12px;
-            background: #000;
-            margin-bottom: 8px;
-        }
+    .control-grid button {
+      border: none;
+      background: #0b5ed7;
+      color: white;
+    }
 
-        button {
-            width: 100%;
-            max-width: 320px;
-            padding: 12px;
-            margin: 4px 0;
-            border: none;
-            border-radius: 10px;
-            background: #0b5ed7;
-            color: white;
-            font-size: 15px;
-        }
+    .control-grid select {
+      border: 1px solid #ccc;
+      background: white;
+    }
 
-        #estado, #resultado {
-            max-width: 320px;
-            margin: 8px auto;
-            padding: 10px;
-            background: white;
-            border-radius: 12px;
-            font-weight: bold;
-            font-size: 14px;
-        }
+    .preview-box {
+      flex: 1;
+      min-width: 0;
+    }
 
-        .panel {
-            max-width: 420px;
-            margin: 8px auto;
-            padding: 10px;
-            background: white;
-            border-radius: 12px;
-            text-align: left;
-            font-size: 13px;
-        }
+    .preview-box h3 {
+      font-size: 13px;
+      margin: 4px 0;
+    }
 
-        .registro {
-            border-bottom: 1px solid #ddd;
-            padding: 8px 0;
-        }
+    .preview-box canvas {
+      width: 100%;
+      max-width: 180px;
+      max-height: 140px;
+      object-fit: contain;
+      border-radius: 10px;
+      background: #000;
+    }
 
-            .registro:last-child {
-                border-bottom: none;
-            }
-        select {
-            width: 100%;
-            max-width: 320px;
-            padding: 12px;
-            margin: 4px 0;
-            border-radius: 10px;
-            border: 1px solid #ccc;
-            font-size: 15px;
-        }
-        .patente {
-            font-size: 18px;
-            font-weight: bold;
-            color: #0b5ed7;
-        }
-    </style>
+    video {
+      width: 100%;
+      max-width: 320px;
+      max-height: 220px;
+      object-fit: cover;
+      border-radius: 12px;
+      background: #000;
+    }
+
+    canvas {
+      width: 100%;
+      max-width: 320px;
+      border-radius: 12px;
+      background: #000;
+      margin-bottom: 8px;
+    }
+
+
+    #estado,
+    #resultado {
+      max-width: 320px;
+      margin: 8px auto;
+      padding: 10px;
+      background: white;
+      border-radius: 12px;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .panel {
+      max-width: 100%;
+      margin: 8px auto;
+      padding: 10px;
+      background: white;
+      border-radius: 12px;
+      text-align: left;
+      font-size: 13px;
+    }
+
+    .registro {
+      border-bottom: 1px solid #ddd;
+      padding: 8px 0;
+    }
+
+    .registro:last-child {
+      border-bottom: none;
+    }
+
+    .patente {
+      font-size: 18px;
+      font-weight: bold;
+      color: #0b5ed7;
+    }
+  </style>
 </head>
 
 <body>
 
-    <h2>Lector de Patentes con YOLO</h2>
+  <h2>Lector de Patentes con YOLO</h2>
 
-    <video id="video" autoplay playsinline></video>
+  <video id="video" autoplay playsinline></video>
 
-    <br>
-
+  <div class="control-grid">
     <button onclick="iniciarCamara()">Activar cámara</button>
-    <button onclick="capturarDetectarYLeer()">Capturar y leer patente</button>
+    <button onclick="capturarDetectarYLeer()">Capturar y leer</button>
+
     <select id="intervaloCaptura">
-        <option value="5000">Cada 5 segundos</option>
-        <option value="10000">Cada 10 segundos</option>
-        <option value="15000">Cada 15 segundos</option>
-        <option value="20000">Cada 20 segundos</option>
-        <option value="30000">Cada 30 segundos</option>
-        <option value="60000">Cada 60 segundos</option>
+      <option value="5000">Cada 5 seg.</option>
+      <option value="10000">Cada 10 seg.</option>
+      <option value="15000">Cada 15 seg.</option>
+      <option value="20000">Cada 20 seg.</option>
+      <option value="30000">Cada 30 seg.</option>
+      <option value="60000">Cada 60 seg.</option>
     </select>
 
-    <button onclick="iniciarCapturaAutomatica()">Iniciar captura automática</button>
-    <button onclick="detenerCapturaAutomatica()">Detener captura automática</button>
+    <button onclick="iniciarCapturaAutomatica()">Iniciar auto</button>
+
+    <button onclick="detenerCapturaAutomatica()">Detener auto</button>
     <button onclick="borrarHistoria()">Borrar historia</button>
-
-    <div id="estado">Cargando modelo...</div>
-    <div id="resultado">Resultado...</div>
-
-    <canvas id="canvasOriginal" style="display:none;"></canvas>
-    <canvas id="canvasModelo" style="display:none;"></canvas>
-
-<div class="preview-container">
-
-  <div class="preview-box">
-    <h3>Detección</h3>
-    <canvas id="canvasPreview"></canvas>
   </div>
 
-  <div class="preview-box">
-    <h3>Recorte patente</h3>
-    <canvas id="canvasRecorte"></canvas>
-  </div>
+  <div id="estado">Cargando modelo...</div>
+  <div id="resultado">Resultado...</div>
 
-</div>
+  <canvas id="canvasOriginal" style="display:none;"></canvas>
+  <canvas id="canvasModelo" style="display:none;"></canvas>
 
-    <div class="panel">
-        <h3>Historial de sesión</h3>
-        <div id="historial">Sin registros.</div>
+  <div class="preview-container">
+
+    <div class="preview-box">
+      <h3>Detección</h3>
+      <canvas id="canvasPreview"></canvas>
     </div>
 
-    <script>
+    <div class="preview-box">
+      <h3>Recorte patente</h3>
+      <canvas id="canvasRecorte"></canvas>
+    </div>
+
+  </div>
+
+  <div class="panel">
+    <h3>Historial de sesión</h3>
+    <div id="historial">Sin registros.</div>
+  </div>
+
+  <script>
     const video = document.getElementById("video");
     const canvasOriginal = document.getElementById("canvasOriginal");
     const canvasModelo = document.getElementById("canvasModelo");
@@ -361,13 +377,13 @@
       });
     }
 
-function actualizarHistorial() {
-  if (historial.length === 0) {
-    historialDiv.innerHTML = "Sin registros.";
-    return;
-  }
+    function actualizarHistorial() {
+      if (historial.length === 0) {
+        historialDiv.innerHTML = "Sin registros.";
+        return;
+      }
 
-  historialDiv.innerHTML = historial.map((r, index) => `
+      historialDiv.innerHTML = historial.map((r, index) => `
     <div class="registro">
       <div class="patente">${index + 1}. ${r.patente}</div>
       <div><strong>Fecha/Hora:</strong> ${r.fechaHoraLocal}</div>
@@ -376,7 +392,7 @@ function actualizarHistorial() {
       <div><strong>Precisión:</strong> ${r.precision ? Math.round(r.precision) + " metros" : "No disponible"}</div>
     </div>
   `).join("");
-}
+    }
 
     function limpiarHistorial() {
       historial = [];
@@ -537,53 +553,54 @@ function actualizarHistorial() {
     }
 
     function guardarHistorialEnLocalStorage() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(historial));
-}
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(historial));
+    }
 
-function cargarHistorialDesdeLocalStorage() {
-  try {
-    const data = localStorage.getItem(STORAGE_KEY);
-    return data ? JSON.parse(data) : [];
-  } catch (error) {
-    console.error("Error leyendo localStorage:", error);
-    return [];
-  }
-}
+    function cargarHistorialDesdeLocalStorage() {
+      try {
+        const data = localStorage.getItem(STORAGE_KEY);
+        return data ? JSON.parse(data) : [];
+      } catch (error) {
+        console.error("Error leyendo localStorage:", error);
+        return [];
+      }
+    }
 
-function borrarHistoria() {
-  historial = [];
-  localStorage.removeItem(STORAGE_KEY);
-  actualizarHistorial();
-  resultado.innerText = "Historia borrada.";
-}
+    function borrarHistoria() {
+      historial = [];
+      localStorage.removeItem(STORAGE_KEY);
+      actualizarHistorial();
+      resultado.innerText = "Historia borrada.";
+    }
 
-function iniciarCapturaAutomatica() {
-  if (capturaAutomaticaTimer) {
-    resultado.innerText = "La captura automática ya está activa.";
-    return;
-  }
+    function iniciarCapturaAutomatica() {
+      if (capturaAutomaticaTimer) {
+        resultado.innerText = "La captura automática ya está activa.";
+        return;
+      }
 
-  const intervalo = Number(document.getElementById("intervaloCaptura").value);
+      const intervalo = Number(document.getElementById("intervaloCaptura").value);
 
-  resultado.innerText = `Captura automática iniciada cada ${intervalo / 1000} segundos.`;
+      resultado.innerText = `Captura automática iniciada cada ${intervalo / 1000} segundos.`;
 
-  capturarDetectarYLeer();
+      capturarDetectarYLeer();
 
-  capturaAutomaticaTimer = setInterval(() => {
-    capturarDetectarYLeer();
-  }, intervalo);
-}
+      capturaAutomaticaTimer = setInterval(() => {
+        capturarDetectarYLeer();
+      }, intervalo);
+    }
 
-function detenerCapturaAutomatica() {
-  if (capturaAutomaticaTimer) {
-    clearInterval(capturaAutomaticaTimer);
-    capturaAutomaticaTimer = null;
-    resultado.innerText = "Captura automática detenida.";
-  } else {
-    resultado.innerText = "La captura automática no está activa.";
-  }
-}
-    </script>
+    function detenerCapturaAutomatica() {
+      if (capturaAutomaticaTimer) {
+        clearInterval(capturaAutomaticaTimer);
+        capturaAutomaticaTimer = null;
+        resultado.innerText = "Captura automática detenida.";
+      } else {
+        resultado.innerText = "La captura automática no está activa.";
+      }
+    }
+  </script>
 
 </body>
+
 </html>
