@@ -118,7 +118,9 @@
       text-align: left;
       font-size: 13px;
     }
-
+.auto-activo {
+  background: #dc3545 !important;
+}
     .registro {
       border-bottom: 1px solid #ddd;
       padding: 8px 0;
@@ -155,9 +157,9 @@
       <option value="60000">Cada 60 seg.</option>
     </select>
 
-    <button onclick="iniciarCapturaAutomatica()">Iniciar auto</button>
-
-    <button onclick="detenerCapturaAutomatica()">Detener auto</button>
+<button id="btnAuto" onclick="toggleCapturaAutomatica()">
+  Iniciar auto
+</button>
     <button onclick="borrarHistoria()">Borrar historia</button>
   </div>
 
@@ -204,6 +206,8 @@
     const STORAGE_KEY = "historial_patentes_yolo";
     let historial = cargarHistorialDesdeLocalStorage();
     let capturaAutomaticaTimer = null;
+
+    const btnAuto = document.getElementById("btnAuto");
 
     actualizarHistorial();
 
@@ -573,32 +577,45 @@
       resultado.innerText = "Historia borrada.";
     }
 
-    function iniciarCapturaAutomatica() {
-      if (capturaAutomaticaTimer) {
-        resultado.innerText = "La captura automática ya está activa.";
-        return;
-      }
+    function toggleCapturaAutomatica() {
+  if (capturaAutomaticaTimer) {
+    detenerCapturaAutomatica();
+  } else {
+    iniciarCapturaAutomatica();
+  }
+}
 
-      const intervalo = Number(document.getElementById("intervaloCaptura").value);
+function iniciarCapturaAutomatica() {
 
-      resultado.innerText = `Captura automática iniciada cada ${intervalo / 1000} segundos.`;
+  const intervalo = Number(
+    document.getElementById("intervaloCaptura").value
+  );
 
-      capturarDetectarYLeer();
+  resultado.innerText =
+    `Captura automática iniciada cada ${intervalo / 1000} segundos.`;
 
-      capturaAutomaticaTimer = setInterval(() => {
-        capturarDetectarYLeer();
-      }, intervalo);
-    }
+  btnAuto.innerText = "Detener auto";
+  btnAuto.classList.add("auto-activo");
 
-    function detenerCapturaAutomatica() {
-      if (capturaAutomaticaTimer) {
-        clearInterval(capturaAutomaticaTimer);
-        capturaAutomaticaTimer = null;
-        resultado.innerText = "Captura automática detenida.";
-      } else {
-        resultado.innerText = "La captura automática no está activa.";
-      }
-    }
+  capturarDetectarYLeer();
+
+  capturaAutomaticaTimer = setInterval(() => {
+    capturarDetectarYLeer();
+  }, intervalo);
+}
+
+function detenerCapturaAutomatica() {
+
+  clearInterval(capturaAutomaticaTimer);
+  capturaAutomaticaTimer = null;
+
+  btnAuto.innerText = "Iniciar auto";
+  btnAuto.classList.remove("auto-activo");
+
+  resultado.innerText = "Captura automática detenida.";
+}
+
+    
   </script>
 
 </body>
