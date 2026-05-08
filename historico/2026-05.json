@@ -1,8 +1,68 @@
 {
   "periodo": "2026-05",
-  "totalRegistros": 4,
-  "fechaExportacion": "2026-05-08T19:48:05.073Z",
+  "totalRegistros": 10,
+  "fechaExportacion": "2026-05-08T19:48:51.805Z",
   "registros": [
+    {
+      "id": "90165c18-20ce-4ca6-ab8f-be7c55466da1",
+      "patente": "GKSB78",
+      "fechaHoraISO": "2026-05-08T19:48:48.056Z",
+      "fechaHoraLocal": "08-05-2026, 3:48:48 p.m.",
+      "latitud": -33.4435683653348,
+      "longitud": -70.64914949643064,
+      "precision": 1414.0000289641805,
+      "ubicacionDisponible": true
+    },
+    {
+      "id": "044b0ed7-8ae4-41bc-bba6-9aae7e3fbd44",
+      "patente": "GKSB78",
+      "fechaHoraISO": "2026-05-08T19:48:45.060Z",
+      "fechaHoraLocal": "08-05-2026, 3:48:45 p.m.",
+      "latitud": -33.44356836533471,
+      "longitud": -70.64914949643044,
+      "precision": 1414.0000280023312,
+      "ubicacionDisponible": true
+    },
+    {
+      "id": "462c091f-b24f-46ce-b925-f57c79d36773",
+      "patente": "GKSB78",
+      "fechaHoraISO": "2026-05-08T19:48:42.048Z",
+      "fechaHoraLocal": "08-05-2026, 3:48:42 p.m.",
+      "latitud": -33.44356836533465,
+      "longitud": -70.64914949643031,
+      "precision": 1414.000028006545,
+      "ubicacionDisponible": true
+    },
+    {
+      "id": "0cc7e91a-c881-4d32-868e-46bab94dd0f5",
+      "patente": "GKSB78",
+      "fechaHoraISO": "2026-05-08T19:48:39.064Z",
+      "fechaHoraLocal": "08-05-2026, 3:48:39 p.m.",
+      "latitud": -33.443568365334585,
+      "longitud": -70.64914949643017,
+      "precision": 1414.0000280105696,
+      "ubicacionDisponible": true
+    },
+    {
+      "id": "5a582b57-22e0-4019-89be-d8ea40c0c7f2",
+      "patente": "GKSB78",
+      "fechaHoraISO": "2026-05-08T19:48:36.054Z",
+      "fechaHoraLocal": "08-05-2026, 3:48:36 p.m.",
+      "latitud": -33.44356836533452,
+      "longitud": -70.64914949643003,
+      "precision": 1414,
+      "ubicacionDisponible": true
+    },
+    {
+      "id": "22ce4bd5-c280-4702-b2ef-e76fc3130da1",
+      "patente": "GKSB78",
+      "fechaHoraISO": "2026-05-08T19:48:33.054Z",
+      "fechaHoraLocal": "08-05-2026, 3:48:33 p.m.",
+      "latitud": -33.4434294978567,
+      "longitud": -70.64885286889856,
+      "precision": 1414.0000000000002,
+      "ubicacionDisponible": true
+    },
     {
       "id": "197693ad-8804-4d2b-834d-c6c87ffcbd22",
       "patente": "GKSB78",
