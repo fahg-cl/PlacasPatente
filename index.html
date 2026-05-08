@@ -283,7 +283,7 @@
             }
         }
 
-        async function exportarHistoricoMensual() {
+       /* async function exportarHistoricoMensual() {
             if (!historial || historial.length === 0) {
                 resultado.innerText = "No existen registros para exportar.";
                 return;
@@ -331,7 +331,82 @@
 
             resultado.innerText = `Histórico guardado: historico/${periodo}.json`;
         }
-       
+        */
+        async function exportarHistoricoMensual() {
+            try {
+                if (!historial || historial.length === 0) {
+                    resultado.innerText = "No existen registros para exportar.";
+                    return;
+                }
+
+                resultado.innerText = "Preparando histórico...";
+
+                const ahora = new Date();
+                const yyyy = ahora.getFullYear();
+                const mm = String(ahora.getMonth() + 1).padStart(2, "0");
+
+                const periodo = `${yyyy}-${mm}`;
+
+                const registrosDelMes = historial.filter(r => {
+                    const fecha = new Date(r.fechaHoraISO);
+                    return fecha.getFullYear() === yyyy &&
+                        fecha.getMonth() + 1 === Number(mm);
+                });
+
+                if (registrosDelMes.length === 0) {
+                    resultado.innerText = "No hay registros del mes actual para exportar.";
+                    return;
+                }
+
+                const historico = {
+                    periodo,
+                    totalRegistros: registrosDelMes.length,
+                    fechaExportacion: new Date().toISOString(),
+                    registros: registrosDelMes
+                };
+
+                console.log("Enviando a Worker:", WORKER_URL);
+                console.log("Payload:", historico);
+
+                resultado.innerText = "Enviando histórico al Worker...";
+
+                const respuesta = await fetch(WORKER_URL, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(historico)
+                });
+
+                const textoRespuesta = await respuesta.text();
+
+                console.log("Status Worker:", respuesta.status);
+                console.log("Respuesta Worker:", textoRespuesta);
+
+                let data = null;
+
+                try {
+                    data = JSON.parse(textoRespuesta);
+                } catch (e) {
+                    resultado.innerText = "El Worker respondió, pero no devolvió JSON válido.";
+                    return;
+                }
+
+                if (!respuesta.ok || !data.ok) {
+                    resultado.innerText = `Error al exportar. Status: ${respuesta.status}`;
+                    console.error("Detalle error:", data);
+                    return;
+                }
+
+                resultado.innerText = `Histórico guardado: historico/${periodo}.json`;
+
+            } catch (error) {
+                console.error("Error exportando histórico:", error);
+                resultado.innerText = `Error de conexión con Worker: ${error.message}`;
+            }
+        }
+
+
         async function iniciarCamara() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({
