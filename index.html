@@ -212,10 +212,10 @@
         <h3>Mapa de patentes detectadas</h3>
         <div id="mapaPatentes"></div>
     </div>
-
-    <div id="estado">Cargando modelo...</div>
-
-
+    <div class="control-grid">
+        <div id="estado">Cargando modelo...</div>
+        <button onclick="exportarHistoricoMensual()">Exportar histórico JSON</button>
+    </div>
     <div class="panel">
         <h3>Historial de sesión</h3>
         <div id="historial">Sin registros.</div>
@@ -279,6 +279,58 @@
                 estado.innerHTML = `❌ No se pudo cargar el modelo ONNX.<br><small>Revisa que exista: ${MODEL_PATH}</small>`;
                 resultado.innerText = "Error al cargar el modelo.";
             }
+        }
+
+        function exportarHistoricoMensual() {
+            if (!historial || historial.length === 0) {
+                resultado.innerText = "No existen registros para exportar.";
+                return;
+            }
+
+            const ahora = new Date();
+            const yyyy = ahora.getFullYear();
+            const mm = String(ahora.getMonth() + 1).padStart(2, "0");
+
+            const nombreArchivo = `${yyyy}-${mm}.json`;
+
+            const registrosDelMes = historial.filter(r => {
+                const fecha = new Date(r.fechaHoraISO);
+                return (
+                    fecha.getFullYear() === yyyy &&
+                    fecha.getMonth() + 1 === Number(mm)
+                );
+            });
+
+            if (registrosDelMes.length === 0) {
+                resultado.innerText = "No hay registros del mes actual para exportar.";
+                return;
+            }
+
+            const historico = {
+                periodo: `${yyyy}-${mm}`,
+                totalRegistros: registrosDelMes.length,
+                fechaExportacion: new Date().toISOString(),
+                registros: registrosDelMes
+            };
+
+            const blob = new Blob(
+                [JSON.stringify(historico, null, 2)],
+                { type: "application/json" }
+            );
+
+            const url = URL.createObjectURL(blob);
+
+            const enlace = document.createElement("a");
+            enlace.href = url;
+            enlace.download = nombreArchivo;
+
+            document.body.appendChild(enlace);
+            enlace.click();
+            document.body.removeChild(enlace);
+
+            URL.revokeObjectURL(url);
+
+            resultado.innerText = `Archivo exportado: historico/${nombreArchivo}`;
         }
 
         async function iniciarCamara() {
@@ -402,10 +454,10 @@
             const marcador = L.marker([registro.latitud, registro.longitud])
                 .addTo(mapaPatentes)
                 .bindPopup(`
-                                                    <strong>Patente:</strong> ${registro.patente}<br>
-                                                    <strong>Fecha/Hora:</strong> ${registro.fechaHoraLocal}<br>
-                                                    <strong>Precisión:</strong> ${registro.precision ? Math.round(registro.precision) + " metros" : "No disponible"}
-                                        `);
+                                                                    <strong>Patente:</strong> ${registro.patente}<br>
+                                                                    <strong>Fecha/Hora:</strong> ${registro.fechaHoraLocal}<br>
+                                                                    <strong>Precisión:</strong> ${registro.precision ? Math.round(registro.precision) + " metros" : "No disponible"}
+                                                        `);
 
             marcador.bindTooltip(registro.patente, {
                 permanent: false,
@@ -464,14 +516,14 @@
             }
 
             historialDiv.innerHTML = historial.map((r, index) => `
-                                                <div class="registro">
-                                                <div class="patente">${index + 1}. ${r.patente}</div>
-                                                <div><strong>Fecha/Hora:</strong> ${r.fechaHoraLocal}</div>
-                                                <div><strong>Latitud:</strong> ${r.latitud ?? "No disponible"}</div>
-                                                <div><strong>Longitud:</strong> ${r.longitud ?? "No disponible"}</div>
-                                                <div><strong>Precisión:</strong> ${r.precision ? Math.round(r.precision) + " metros" : "No disponible"}</div>
-                                                </div>
-                                                `).join("");
+                                                                <div class="registro">
+                                                                <div class="patente">${index + 1}. ${r.patente}</div>
+                                                                <div><strong>Fecha/Hora:</strong> ${r.fechaHoraLocal}</div>
+                                                                <div><strong>Latitud:</strong> ${r.latitud ?? "No disponible"}</div>
+                                                                <div><strong>Longitud:</strong> ${r.longitud ?? "No disponible"}</div>
+                                                                <div><strong>Precisión:</strong> ${r.precision ? Math.round(r.precision) + " metros" : "No disponible"}</div>
+                                                                </div>
+                                                                `).join("");
         }
 
         function limpiarHistorial() {
