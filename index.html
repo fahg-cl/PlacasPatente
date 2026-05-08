@@ -2,621 +2,681 @@
 <html lang="es">
 
 <head>
-  <meta charset="UTF-8" />
-  <title>Lector YOLO de Patentes</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8" />
+    <title>Lector YOLO de Patentes</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f4f4;
-      padding: 4px;
-      text-align: center;
-      margin: 0;
-    }
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            padding: 4px;
+            text-align: center;
+            margin: 0;
+        }
 
-    h2,
-    h3 {
-      margin: 8px 0;
-    }
+        h2,
+        h3 {
+            margin: 8px 0;
+        }
 
-    .preview-container {
-      display: flex;
-      gap: 8px;
-      justify-content: center;
-      align-items: flex-start;
-      flex-wrap: nowrap;
-      max-width: 100%;
-      margin: auto;
-    }
+        .preview-container {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            align-items: flex-start;
+            flex-wrap: nowrap;
+            max-width: 100%;
+            margin: auto;
+        }
 
-    .control-grid {
-      max-width: 100%;
-      margin: 8px auto;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-    }
+        .control-grid {
+            max-width: 100%;
+            margin: 8px auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
 
-    .control-grid button,
-    .control-grid select {
-      width: 100%;
-      padding: 11px 8px;
-      border-radius: 10px;
-      font-size: 13px;
-      box-sizing: border-box;
-    }
+        #mapaPatentes {
+            width: 100%;
+            height: 300px;
+            border-radius: 12px;
+            margin-top: 8px;
+        }
 
-    .control-grid button {
-      border: none;
-      background: #0b5ed7;
-      color: white;
-    }
+        .control-grid button,
+        .control-grid select {
+            width: 100%;
+            padding: 11px 8px;
+            border-radius: 10px;
+            font-size: 13px;
+            box-sizing: border-box;
+        }
 
-    .control-grid select {
-      border: 1px solid #ccc;
-      background: white;
-    }
+        .control-grid button {
+            border: none;
+            background: #0b5ed7;
+            color: white;
+        }
 
-    .preview-box {
-      flex: 1;
-      min-width: 0;
-    }
+        .control-grid select {
+            border: 1px solid #ccc;
+            background: white;
+        }
 
-    .preview-box h3 {
-      font-size: 13px;
-      margin: 4px 0;
-    }
+        .preview-box {
+            flex: 1;
+            min-width: 0;
+        }
 
-    .preview-box canvas {
-      width: 100%;
-      max-width: 180px;
-      max-height: 140px;
-      object-fit: contain;
-      border-radius: 10px;
-      background: #000;
-    }
+            .preview-box h3 {
+                font-size: 13px;
+                margin: 4px 0;
+            }
 
-    video {
-      width: 100%;
-      max-width: 320px;
-      max-height: 220px;
-      object-fit: cover;
-      border-radius: 12px;
-      background: #000;
-    }
+            .preview-box canvas {
+                width: 100%;
+                max-width: 180px;
+                max-height: 140px;
+                object-fit: contain;
+                border-radius: 10px;
+                background: #000;
+            }
 
-    canvas {
-      width: 100%;
-      max-width: 320px;
-      border-radius: 12px;
-      background: #000;
-      margin-bottom: 8px;
-    }
+        video {
+            width: 100%;
+            max-width: 320px;
+            max-height: 220px;
+            object-fit: cover;
+            border-radius: 12px;
+            background: #000;
+        }
+
+        canvas {
+            width: 100%;
+            max-width: 320px;
+            border-radius: 12px;
+            background: #000;
+            margin-bottom: 8px;
+        }
 
 
-    #estado,
-    #resultado {
-      max-width: 320px;
-      margin: 8px auto;
-      padding: 10px;
-      background: white;
-      border-radius: 12px;
-      font-weight: bold;
-      font-size: 14px;
-    }
+        #estado,
+        #resultado {
+            max-width: 320px;
+            margin: 8px auto;
+            padding: 10px;
+            background: white;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 14px;
+        }
 
-    .panel {
-      max-width: 100%;
-      margin: 8px auto;
-      padding: 10px;
-      background: white;
-      border-radius: 12px;
-      text-align: left;
-      font-size: 13px;
-    }
-.auto-activo {
-  background: #dc3545 !important;
-}
-    .registro {
-      border-bottom: 1px solid #ddd;
-      padding: 8px 0;
-    }
+        .panel {
+            max-width: 100%;
+            margin: 8px auto;
+            padding: 10px;
+            background: white;
+            border-radius: 12px;
+            text-align: left;
+            font-size: 13px;
+        }
 
-    .registro:last-child {
-      border-bottom: none;
-    }
+        .auto-activo {
+            background: #dc3545 !important;
+        }
 
-    .patente {
-      font-size: 18px;
-      font-weight: bold;
-      color: #0b5ed7;
-    }
-  </style>
+        .registro {
+            border-bottom: 1px solid #ddd;
+            padding: 8px 0;
+        }
+
+            .registro:last-child {
+                border-bottom: none;
+            }
+
+        .patente {
+            font-size: 18px;
+            font-weight: bold;
+            color: #0b5ed7;
+        }
+    </style>
 </head>
 
 <body>
 
-  <h2>Lector de Patentes con YOLO</h2>
+    <h2>Lector de Patentes con YOLO</h2>
 
-  <video id="video" autoplay playsinline></video>
+    <video id="video" autoplay playsinline></video>
 
-  <div class="control-grid">
-    <button onclick="iniciarCamara()">Activar cámara</button>
-    <button onclick="capturarDetectarYLeer()">Capturar y leer</button>
+    <div class="control-grid">
+        <button onclick="iniciarCamara()">Activar cámara</button>
+        <button onclick="capturarDetectarYLeer()">Capturar y leer</button>
 
-    <select id="intervaloCaptura">
-      <option value="5000">Cada 5 seg.</option>
-      <option value="10000">Cada 10 seg.</option>
-      <option value="15000">Cada 15 seg.</option>
-      <option value="20000">Cada 20 seg.</option>
-      <option value="30000">Cada 30 seg.</option>
-      <option value="60000">Cada 60 seg.</option>
-    </select>
+        <select id="intervaloCaptura">
+            <option value="5000">Cada 5 seg.</option>
+            <option value="10000">Cada 10 seg.</option>
+            <option value="15000">Cada 15 seg.</option>
+            <option value="20000">Cada 20 seg.</option>
+            <option value="30000">Cada 30 seg.</option>
+            <option value="60000">Cada 60 seg.</option>
+        </select>
 
-<button id="btnAuto" onclick="toggleCapturaAutomatica()">
-  Iniciar auto
-</button>
-    <button onclick="borrarHistoria()">Borrar historia</button>
-  </div>
-
-  <div id="estado">Cargando modelo...</div>
-  <div id="resultado">Resultado...</div>
-
-  <canvas id="canvasOriginal" style="display:none;"></canvas>
-  <canvas id="canvasModelo" style="display:none;"></canvas>
-
-  <div class="preview-container">
-
-    <div class="preview-box">
-      <h3>Detección</h3>
-      <canvas id="canvasPreview"></canvas>
+        <button id="btnAuto" onclick="toggleCapturaAutomatica()">
+            Iniciar auto
+        </button>
+        <button onclick="borrarHistoria()">Borrar historia</button>
     </div>
 
-    <div class="preview-box">
-      <h3>Recorte patente</h3>
-      <canvas id="canvasRecorte"></canvas>
+    <div id="estado">Cargando modelo...</div>
+    <div id="resultado">Resultado...</div>
+
+    <canvas id="canvasOriginal" style="display:none;"></canvas>
+    <canvas id="canvasModelo" style="display:none;"></canvas>
+
+    <div class="preview-container">
+
+        <div class="preview-box">
+            <h3>Detección</h3>
+            <canvas id="canvasPreview"></canvas>
+        </div>
+
+        <div class="preview-box">
+            <h3>Recorte patente</h3>
+            <canvas id="canvasRecorte"></canvas>
+        </div>
+
     </div>
 
-  </div>
+    <div class="panel">
+        <h3>Historial de sesión</h3>
+        <div id="historial">Sin registros.</div>
+    </div>
 
-  <div class="panel">
-    <h3>Historial de sesión</h3>
-    <div id="historial">Sin registros.</div>
-  </div>
+    <div class="panel">
+        <h3>Mapa de patentes detectadas</h3>
+        <div id="mapaPatentes"></div>
+    </div>
 
-  <script>
-    const video = document.getElementById("video");
-    const canvasOriginal = document.getElementById("canvasOriginal");
-    const canvasModelo = document.getElementById("canvasModelo");
-    const canvasPreview = document.getElementById("canvasPreview");
-    const canvasRecorte = document.getElementById("canvasRecorte");
-    const estado = document.getElementById("estado");
-    const resultado = document.getElementById("resultado");
-    const historialDiv = document.getElementById("historial");
+    <script>
+        const video = document.getElementById("video");
+        const canvasOriginal = document.getElementById("canvasOriginal");
+        const canvasModelo = document.getElementById("canvasModelo");
+        const canvasPreview = document.getElementById("canvasPreview");
+        const canvasRecorte = document.getElementById("canvasRecorte");
+        const estado = document.getElementById("estado");
+        const resultado = document.getElementById("resultado");
+        const historialDiv = document.getElementById("historial");
 
-    const MODEL_PATH = "./model/license_plate.onnx";
-    const MODEL_SIZE = 640;
-    const CONFIDENCE_THRESHOLD = 0.35;
+        const MODEL_PATH = "./model/license_plate.onnx";
+        const MODEL_SIZE = 640;
+        const CONFIDENCE_THRESHOLD = 0.35;
 
-    let session = null;
-    const STORAGE_KEY = "historial_patentes_yolo";
-    let historial = cargarHistorialDesdeLocalStorage();
-    let capturaAutomaticaTimer = null;
+        let mapaPatentes = null;
+        let marcadoresPatentes = [];
 
-    const btnAuto = document.getElementById("btnAuto");
+        let session = null;
+        const STORAGE_KEY = "historial_patentes_yolo";
+        let historial = cargarHistorialDesdeLocalStorage();
+        let capturaAutomaticaTimer = null;
 
-    actualizarHistorial();
+        const btnAuto = document.getElementById("btnAuto");
 
-    cargarModelo();
+        actualizarHistorial();
 
-    async function cargarModelo() {
-      estado.innerText = "Cargando modelo YOLO...";
-      resultado.innerText = "Esperando carga del modelo.";
+        cargarModelo();
 
-      try {
-        session = await ort.InferenceSession.create(MODEL_PATH, {
-          executionProviders: ["wasm"]
-        });
+        function inicializarMapa() {
+            mapaPatentes = L.map("mapaPatentes").setView([-33.4489, -70.6693], 12);
 
-        estado.innerHTML = `
-          ✅ Modelo YOLO cargado correctamente.<br>
-          <small>Archivo: ${MODEL_PATH}</small><br>
-          <small>Input: ${session.inputNames[0]}</small><br>
-          <small>Output: ${session.outputNames[0]}</small>
-        `;
+            L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                maxZoom: 19,
+                attribution: "© OpenStreetMap"
+            }).addTo(mapaPatentes);
 
-        resultado.innerText = "Modelo listo. Puedes activar la cámara.";
-      } catch (error) {
-        console.error("Error cargando modelo:", error);
-
-        estado.innerHTML = `
-          ❌ No se pudo cargar el modelo ONNX.<br>
-          <small>Revisa que exista: ${MODEL_PATH}</small>
-        `;
-
-        resultado.innerText = "Error al cargar el modelo.";
-      }
-    }
-
-    async function iniciarCamara() {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            facingMode: "environment",
-            width: { ideal: 1280 },
-            height: { ideal: 720 }
-          },
-          audio: false
-        });
-
-        video.srcObject = stream;
-        resultado.innerText = "Cámara activa.";
-      } catch (error) {
-        resultado.innerText = "No se pudo acceder a la cámara.";
-        console.error(error);
-      }
-    }
-
-    async function capturarDetectarYLeer() {
-      if (!session) {
-        resultado.innerText = "El modelo YOLO aún no está cargado o falló la carga.";
-        return;
-      }
-
-      if (!video.videoWidth || !video.videoHeight) {
-        resultado.innerText = "Primero activa la cámara.";
-        return;
-      }
-
-      resultado.innerText = "Detectando patente...";
-
-      const ctx = canvasOriginal.getContext("2d");
-      canvasOriginal.width = video.videoWidth;
-      canvasOriginal.height = video.videoHeight;
-      ctx.drawImage(video, 0, 0, canvasOriginal.width, canvasOriginal.height);
-
-      const deteccion = await detectarPatenteYOLO(canvasOriginal);
-
-      if (!deteccion) {
-        resultado.innerText = "No se detectó una patente.";
-        return;
-      }
-
-      dibujarDeteccion(canvasOriginal, deteccion);
-      recortarPatente(canvasOriginal, deteccion);
-
-      resultado.innerText = "Leyendo patente...";
-
-      const imagenRecorte = canvasRecorte.toDataURL("image/png");
-
-      try {
-        const lectura = await Tesseract.recognize(
-          imagenRecorte,
-          "eng",
-          {
-            tessedit_char_whitelist: "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-          }
-        );
-
-        const texto = lectura.data.text
-          .toUpperCase()
-          .replace(/[^A-Z0-9]/g, "");
-
-        const patente = extraerPatente(texto);
-
-        if (!patente) {
-          resultado.innerText = "Texto detectado, pero no parece una patente válida.";
-          return;
+            cargarMarcadoresDesdeHistorial();
         }
 
-        resultado.innerText = `Patente reconocida: ${patente}`;
+        async function cargarModelo() {
+            estado.innerText = "Cargando modelo YOLO...";
+            resultado.innerText = "Esperando carga del modelo.";
 
-        await registrarLectura(patente);
+            try {
+                session = await ort.InferenceSession.create(MODEL_PATH, {
+                    executionProviders: ["wasm"]
+                });
 
-      } catch (error) {
-        resultado.innerText = "Error al leer el texto.";
-        console.error(error);
-      }
-    }
+                estado.innerHTML = `✅ Modelo YOLO cargado correctamente.<br><small>Archivo: ${MODEL_PATH}</small><br><small>Input: ${session.inputNames[0]}</small><br><small>Output: ${session.outputNames[0]}</small>`;
+                resultado.innerText = "Modelo listo. Puedes activar la cámara.";
+            } catch (error) {
+                console.error("Error cargando modelo:", error);
 
-    async function registrarLectura(patente) {
-      const fechaHora = new Date();
-
-      let ubicacion = {
-        latitud: null,
-        longitud: null,
-        precision: null,
-        disponible: false
-      };
-
-      try {
-        ubicacion = await obtenerUbicacion();
-      } catch (error) {
-        console.warn("No se pudo obtener ubicación:", error);
-      }
-
-      const registro = {
-        id: crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(),
-        patente,
-        fechaHoraISO: fechaHora.toISOString(),
-        fechaHoraLocal: fechaHora.toLocaleString("es-CL"),
-        latitud: ubicacion.latitud,
-        longitud: ubicacion.longitud,
-        precision: ubicacion.precision,
-        ubicacionDisponible: ubicacion.disponible
-      };
-
-      historial.unshift(registro);
-      guardarHistorialEnLocalStorage();
-      actualizarHistorial();
-    }
-
-    function obtenerUbicacion() {
-      return new Promise((resolve, reject) => {
-        if (!navigator.geolocation) {
-          reject("Geolocalización no soportada.");
-          return;
+                estado.innerHTML = `❌ No se pudo cargar el modelo ONNX.<br><small>Revisa que exista: ${MODEL_PATH}</small>`;
+                resultado.innerText = "Error al cargar el modelo.";
+            }
         }
 
-        navigator.geolocation.getCurrentPosition(
-          position => {
-            resolve({
-              latitud: position.coords.latitude,
-              longitud: position.coords.longitude,
-              precision: position.coords.accuracy,
-              disponible: true
+        async function iniciarCamara() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: "environment",
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    },
+                    audio: false
+                });
+
+                video.srcObject = stream;
+                resultado.innerText = "Cámara activa.";
+            } catch (error) {
+                resultado.innerText = "No se pudo acceder a la cámara.";
+                console.error(error);
+            }
+        }
+
+        async function capturarDetectarYLeer() {
+            if (!session) {
+                resultado.innerText = "El modelo YOLO aún no está cargado o falló la carga.";
+                return;
+            }
+
+            if (!video.videoWidth || !video.videoHeight) {
+                resultado.innerText = "Primero activa la cámara.";
+                return;
+            }
+
+            resultado.innerText = "Detectando patente...";
+
+            const ctx = canvasOriginal.getContext("2d");
+            canvasOriginal.width = video.videoWidth;
+            canvasOriginal.height = video.videoHeight;
+            ctx.drawImage(video, 0, 0, canvasOriginal.width, canvasOriginal.height);
+
+            const deteccion = await detectarPatenteYOLO(canvasOriginal);
+
+            if (!deteccion) {
+                resultado.innerText = "No se detectó una patente.";
+                return;
+            }
+
+            dibujarDeteccion(canvasOriginal, deteccion);
+            recortarPatente(canvasOriginal, deteccion);
+
+            resultado.innerText = "Leyendo patente...";
+
+            const imagenRecorte = canvasRecorte.toDataURL("image/png");
+
+            try {
+                const lectura = await Tesseract.recognize(
+                    imagenRecorte,
+                    "eng",
+                    {
+                        tessedit_char_whitelist: "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+                    }
+                );
+
+                const texto = lectura.data.text
+                    .toUpperCase()
+                    .replace(/[^A-Z0-9]/g, "");
+
+                const patente = extraerPatente(texto);
+
+                if (!patente) {
+                    resultado.innerText = "Texto detectado, pero no parece una patente válida.";
+                    return;
+                }
+
+                resultado.innerText = `Patente reconocida: ${patente}`;
+
+                await registrarLectura(patente);
+
+            } catch (error) {
+                resultado.innerText = "Error al leer el texto.";
+                console.error(error);
+            }
+        }
+
+        async function registrarLectura(patente) {
+            const fechaHora = new Date();
+
+            let ubicacion = {
+                latitud: null,
+                longitud: null,
+                precision: null,
+                disponible: false
+            };
+
+            try {
+                ubicacion = await obtenerUbicacion();
+            } catch (error) {
+                console.warn("No se pudo obtener ubicación:", error);
+            }
+
+            const registro = {
+                id: crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(),
+                patente,
+                fechaHoraISO: fechaHora.toISOString(),
+                fechaHoraLocal: fechaHora.toLocaleString("es-CL"),
+                latitud: ubicacion.latitud,
+                longitud: ubicacion.longitud,
+                precision: ubicacion.precision,
+                ubicacionDisponible: ubicacion.disponible
+            };
+
+            historial.unshift(registro);
+            guardarHistorialEnLocalStorage();
+            actualizarHistorial();
+            agregarMarcadorPatente(registro);
+        }
+
+        function agregarMarcadorPatente(registro) {
+            if (!mapaPatentes) return;
+            if (!registro.latitud || !registro.longitud) return;
+
+            const marcador = L.marker([registro.latitud, registro.longitud])
+                .addTo(mapaPatentes)
+                .bindPopup(`
+                        <strong>Patente:</strong> ${registro.patente}<br>
+                        <strong>Fecha/Hora:</strong> ${registro.fechaHoraLocal}<br>
+                        <strong>Precisión:</strong> ${registro.precision ? Math.round(registro.precision) + " metros" : "No disponible"}
+            `);
+
+            marcador.bindTooltip(registro.patente, {
+                permanent: false,
+                direction: "top"
             });
-          },
-          error => reject(error),
-          {
-            enableHighAccuracy: true,
-            timeout: 8000,
-            maximumAge: 0
-          }
-        );
-      });
-    }
 
-    function actualizarHistorial() {
-      if (historial.length === 0) {
-        historialDiv.innerHTML = "Sin registros.";
-        return;
-      }
+            marcadoresPatentes.push(marcador);
 
-      historialDiv.innerHTML = historial.map((r, index) => `
-    <div class="registro">
-      <div class="patente">${index + 1}. ${r.patente}</div>
-      <div><strong>Fecha/Hora:</strong> ${r.fechaHoraLocal}</div>
-      <div><strong>Latitud:</strong> ${r.latitud ?? "No disponible"}</div>
-      <div><strong>Longitud:</strong> ${r.longitud ?? "No disponible"}</div>
-      <div><strong>Precisión:</strong> ${r.precision ? Math.round(r.precision) + " metros" : "No disponible"}</div>
-    </div>
-  `).join("");
-    }
-
-    function limpiarHistorial() {
-      historial = [];
-      actualizarHistorial();
-      resultado.innerText = "Historial limpiado.";
-    }
-
-    async function detectarPatenteYOLO(canvas) {
-      const inputTensor = prepararImagenParaYOLO(canvas);
-
-      const inputName = session.inputNames[0];
-      const outputs = await session.run({
-        [inputName]: inputTensor
-      });
-
-      const outputName = session.outputNames[0];
-      const output = outputs[outputName];
-
-      return procesarSalidaYOLO(output, canvas.width, canvas.height);
-    }
-
-    function prepararImagenParaYOLO(canvas) {
-      canvasModelo.width = MODEL_SIZE;
-      canvasModelo.height = MODEL_SIZE;
-
-      const ctx = canvasModelo.getContext("2d");
-      ctx.drawImage(canvas, 0, 0, MODEL_SIZE, MODEL_SIZE);
-
-      const imageData = ctx.getImageData(0, 0, MODEL_SIZE, MODEL_SIZE);
-      const data = imageData.data;
-
-      const red = [];
-      const green = [];
-      const blue = [];
-
-      for (let i = 0; i < data.length; i += 4) {
-        red.push(data[i] / 255);
-        green.push(data[i + 1] / 255);
-        blue.push(data[i + 2] / 255);
-      }
-
-      const input = new Float32Array([...red, ...green, ...blue]);
-
-      return new ort.Tensor("float32", input, [1, 3, MODEL_SIZE, MODEL_SIZE]);
-    }
-
-    function procesarSalidaYOLO(output, originalWidth, originalHeight) {
-      const data = output.data;
-      const dims = output.dims;
-
-      let mejor = null;
-      let mejorConfianza = 0;
-
-      const cantidad = dims[2] || dims[1];
-
-      for (let i = 0; i < cantidad; i++) {
-        const x = data[i];
-        const y = data[cantidad + i];
-        const w = data[cantidad * 2 + i];
-        const h = data[cantidad * 3 + i];
-        const confianza = data[cantidad * 4 + i];
-
-        if (confianza > CONFIDENCE_THRESHOLD && confianza > mejorConfianza) {
-          mejorConfianza = confianza;
-
-          const escalaX = originalWidth / MODEL_SIZE;
-          const escalaY = originalHeight / MODEL_SIZE;
-
-          mejor = {
-            x: (x - w / 2) * escalaX,
-            y: (y - h / 2) * escalaY,
-            width: w * escalaX,
-            height: h * escalaY,
-            confidence: confianza
-          };
+            mapaPatentes.setView([registro.latitud, registro.longitud], 16);
         }
-      }
 
-      return mejor;
-    }
+        function cargarMarcadoresDesdeHistorial() {
+            historial.forEach(registro => {
+                agregarMarcadorPatente(registro);
+            });
+        }
 
-    function dibujarDeteccion(canvas, rect) {
-      canvasPreview.width = canvas.width;
-      canvasPreview.height = canvas.height;
+        function limpiarMarcadoresMapa() {
+            marcadoresPatentes.forEach(marcador => {
+                mapaPatentes.removeLayer(marcador);
+            });
 
-      const ctx = canvasPreview.getContext("2d");
-      ctx.drawImage(canvas, 0, 0);
+            marcadoresPatentes = [];
+        }
 
-      ctx.lineWidth = 6;
-      ctx.strokeStyle = "lime";
-      ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
+        function obtenerUbicacion() {
+            return new Promise((resolve, reject) => {
+                if (!navigator.geolocation) {
+                    reject("Geolocalización no soportada.");
+                    return;
+                }
 
-      ctx.font = "28px Arial";
-      ctx.fillStyle = "lime";
-      ctx.fillText(
-        `Patente ${(rect.confidence * 100).toFixed(1)}%`,
-        rect.x,
-        Math.max(rect.y - 10, 30)
-      );
-    }
+                navigator.geolocation.getCurrentPosition(
+                    position => {
+                        resolve({
+                            latitud: position.coords.latitude,
+                            longitud: position.coords.longitude,
+                            precision: position.coords.accuracy,
+                            disponible: true
+                        });
+                    },
+                    error => reject(error),
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 8000,
+                        maximumAge: 0
+                    }
+                );
+            });
+        }
 
-    function recortarPatente(canvas, rect) {
-      const margen = 16;
+        function actualizarHistorial() {
+            if (historial.length === 0) {
+                historialDiv.innerHTML = "Sin registros.";
+                return;
+            }
 
-      const x = Math.max(rect.x - margen, 0);
-      const y = Math.max(rect.y - margen, 0);
-      const width = Math.min(rect.width + margen * 2, canvas.width - x);
-      const height = Math.min(rect.height + margen * 2, canvas.height - y);
+            historialDiv.innerHTML = historial.map((r, index) => `
+                    <div class="registro">
+                    <div class="patente">${index + 1}. ${r.patente}</div>
+                    <div><strong>Fecha/Hora:</strong> ${r.fechaHoraLocal}</div>
+                    <div><strong>Latitud:</strong> ${r.latitud ?? "No disponible"}</div>
+                    <div><strong>Longitud:</strong> ${r.longitud ?? "No disponible"}</div>
+                    <div><strong>Precisión:</strong> ${r.precision ? Math.round(r.precision) + " metros" : "No disponible"}</div>
+                    </div>
+                    `).join("");
+        }
 
-      canvasRecorte.width = width;
-      canvasRecorte.height = height;
+        function limpiarHistorial() {
+            historial = [];
+            actualizarHistorial();
+            resultado.innerText = "Historial limpiado.";
+        }
 
-      const ctx = canvasRecorte.getContext("2d");
+        async function detectarPatenteYOLO(canvas) {
+            const inputTensor = prepararImagenParaYOLO(canvas);
 
-      ctx.drawImage(
-        canvas,
-        x,
-        y,
-        width,
-        height,
-        0,
-        0,
-        width,
-        height
-      );
+            const inputName = session.inputNames[0];
+            const outputs = await session.run({
+                [inputName]: inputTensor
+            });
 
-      mejorarImagenOCR(ctx, width, height);
-    }
+            const outputName = session.outputNames[0];
+            const output = outputs[outputName];
 
-    function mejorarImagenOCR(ctx, width, height) {
-      const imageData = ctx.getImageData(0, 0, width, height);
-      const data = imageData.data;
+            return procesarSalidaYOLO(output, canvas.width, canvas.height);
+        }
 
-      for (let i = 0; i < data.length; i += 4) {
-        const gris = data[i] * 0.3 + data[i + 1] * 0.59 + data[i + 2] * 0.11;
-        const valor = gris > 130 ? 255 : 0;
+        function prepararImagenParaYOLO(canvas) {
+            canvasModelo.width = MODEL_SIZE;
+            canvasModelo.height = MODEL_SIZE;
 
-        data[i] = valor;
-        data[i + 1] = valor;
-        data[i + 2] = valor;
-      }
+            const ctx = canvasModelo.getContext("2d");
+            ctx.drawImage(canvas, 0, 0, MODEL_SIZE, MODEL_SIZE);
 
-      ctx.putImageData(imageData, 0, 0);
-    }
+            const imageData = ctx.getImageData(0, 0, MODEL_SIZE, MODEL_SIZE);
+            const data = imageData.data;
 
-    function extraerPatente(texto) {
-      const patrones = [
-        /[A-Z]{4}[0-9]{2}/,
-        /[A-Z]{2}[0-9]{4}/
-      ];
+            const red = [];
+            const green = [];
+            const blue = [];
 
-      for (const patron of patrones) {
-        const match = texto.match(patron);
-        if (match) return match[0];
-      }
+            for (let i = 0; i < data.length; i += 4) {
+                red.push(data[i] / 255);
+                green.push(data[i + 1] / 255);
+                blue.push(data[i + 2] / 255);
+            }
 
-      return null;
-    }
+            const input = new Float32Array([...red, ...green, ...blue]);
 
-    function guardarHistorialEnLocalStorage() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(historial));
-    }
+            return new ort.Tensor("float32", input, [1, 3, MODEL_SIZE, MODEL_SIZE]);
+        }
 
-    function cargarHistorialDesdeLocalStorage() {
-      try {
-        const data = localStorage.getItem(STORAGE_KEY);
-        return data ? JSON.parse(data) : [];
-      } catch (error) {
-        console.error("Error leyendo localStorage:", error);
-        return [];
-      }
-    }
+        function procesarSalidaYOLO(output, originalWidth, originalHeight) {
+            const data = output.data;
+            const dims = output.dims;
 
-    function borrarHistoria() {
-      historial = [];
-      localStorage.removeItem(STORAGE_KEY);
-      actualizarHistorial();
-      resultado.innerText = "Historia borrada.";
-    }
+            let mejor = null;
+            let mejorConfianza = 0;
 
-    function toggleCapturaAutomatica() {
-  if (capturaAutomaticaTimer) {
-    detenerCapturaAutomatica();
-  } else {
-    iniciarCapturaAutomatica();
-  }
-}
+            const cantidad = dims[2] || dims[1];
 
-function iniciarCapturaAutomatica() {
+            for (let i = 0; i < cantidad; i++) {
+                const x = data[i];
+                const y = data[cantidad + i];
+                const w = data[cantidad * 2 + i];
+                const h = data[cantidad * 3 + i];
+                const confianza = data[cantidad * 4 + i];
 
-  const intervalo = Number(
-    document.getElementById("intervaloCaptura").value
-  );
+                if (confianza > CONFIDENCE_THRESHOLD && confianza > mejorConfianza) {
+                    mejorConfianza = confianza;
 
-  resultado.innerText =
-    `Captura automática iniciada cada ${intervalo / 1000} segundos.`;
+                    const escalaX = originalWidth / MODEL_SIZE;
+                    const escalaY = originalHeight / MODEL_SIZE;
 
-  btnAuto.innerText = "Detener auto";
-  btnAuto.classList.add("auto-activo");
+                    mejor = {
+                        x: (x - w / 2) * escalaX,
+                        y: (y - h / 2) * escalaY,
+                        width: w * escalaX,
+                        height: h * escalaY,
+                        confidence: confianza
+                    };
+                }
+            }
 
-  capturarDetectarYLeer();
+            return mejor;
+        }
 
-  capturaAutomaticaTimer = setInterval(() => {
-    capturarDetectarYLeer();
-  }, intervalo);
-}
+        function dibujarDeteccion(canvas, rect) {
+            canvasPreview.width = canvas.width;
+            canvasPreview.height = canvas.height;
 
-function detenerCapturaAutomatica() {
+            const ctx = canvasPreview.getContext("2d");
+            ctx.drawImage(canvas, 0, 0);
 
-  clearInterval(capturaAutomaticaTimer);
-  capturaAutomaticaTimer = null;
+            ctx.lineWidth = 6;
+            ctx.strokeStyle = "lime";
+            ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
 
-  btnAuto.innerText = "Iniciar auto";
-  btnAuto.classList.remove("auto-activo");
+            ctx.font = "28px Arial";
+            ctx.fillStyle = "lime";
+            ctx.fillText(
+                `Patente ${(rect.confidence * 100).toFixed(1)}%`,
+                rect.x,
+                Math.max(rect.y - 10, 30)
+            );
+        }
 
-  resultado.innerText = "Captura automática detenida.";
-}
+        function recortarPatente(canvas, rect) {
+            const margen = 16;
 
-    
-  </script>
+            const x = Math.max(rect.x - margen, 0);
+            const y = Math.max(rect.y - margen, 0);
+            const width = Math.min(rect.width + margen * 2, canvas.width - x);
+            const height = Math.min(rect.height + margen * 2, canvas.height - y);
+
+            canvasRecorte.width = width;
+            canvasRecorte.height = height;
+
+            const ctx = canvasRecorte.getContext("2d");
+
+            ctx.drawImage(
+                canvas,
+                x,
+                y,
+                width,
+                height,
+                0,
+                0,
+                width,
+                height
+            );
+
+            mejorarImagenOCR(ctx, width, height);
+        }
+
+        function mejorarImagenOCR(ctx, width, height) {
+            const imageData = ctx.getImageData(0, 0, width, height);
+            const data = imageData.data;
+
+            for (let i = 0; i < data.length; i += 4) {
+                const gris = data[i] * 0.3 + data[i + 1] * 0.59 + data[i + 2] * 0.11;
+                const valor = gris > 130 ? 255 : 0;
+
+                data[i] = valor;
+                data[i + 1] = valor;
+                data[i + 2] = valor;
+            }
+
+            ctx.putImageData(imageData, 0, 0);
+        }
+
+        function extraerPatente(texto) {
+            const patrones = [
+                /[A-Z]{4}[0-9]{2}/,
+                /[A-Z]{2}[0-9]{4}/
+            ];
+
+            for (const patron of patrones) {
+                const match = texto.match(patron);
+                if (match) return match[0];
+            }
+
+            return null;
+        }
+
+        function guardarHistorialEnLocalStorage() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(historial));
+        }
+
+        function cargarHistorialDesdeLocalStorage() {
+            try {
+                const data = localStorage.getItem(STORAGE_KEY);
+                return data ? JSON.parse(data) : [];
+            } catch (error) {
+                console.error("Error leyendo localStorage:", error);
+                return [];
+            }
+        }
+
+        function borrarHistoria() {
+            historial = [];
+            localStorage.removeItem(STORAGE_KEY);
+            actualizarHistorial();
+            limpiarMarcadoresMapa();
+            resultado.innerText = "Historia borrada.";
+        }
+
+        function toggleCapturaAutomatica() {
+            if (capturaAutomaticaTimer) {
+                detenerCapturaAutomatica();
+            } else {
+                iniciarCapturaAutomatica();
+            }
+        }
+
+        function iniciarCapturaAutomatica() {
+
+            const intervalo = Number(
+                document.getElementById("intervaloCaptura").value
+            );
+
+            resultado.innerText =
+                `Captura automática iniciada cada ${intervalo / 1000} segundos.`;
+
+            btnAuto.innerText = "Detener auto";
+            btnAuto.classList.add("auto-activo");
+
+            capturarDetectarYLeer();
+
+            capturaAutomaticaTimer = setInterval(() => {
+                capturarDetectarYLeer();
+            }, intervalo);
+        }
+
+        function detenerCapturaAutomatica() {
+
+            clearInterval(capturaAutomaticaTimer);
+            capturaAutomaticaTimer = null;
+
+            btnAuto.innerText = "Iniciar auto";
+            btnAuto.classList.remove("auto-activo");
+
+            resultado.innerText = "Captura automática detenida.";
+        }
+
+        window.addEventListener("load", () => {
+            inicializarMapa();
+        });
+    </script>
 
 </body>
 
