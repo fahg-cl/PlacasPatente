@@ -1,0 +1,37 @@
+{
+  "periodo": "2026-05",
+  "totalRegistros": 3,
+  "fechaExportacion": "2026-05-08T19:39:35.410Z",
+  "registros": [
+    {
+      "id": "e03f54cf-ef1b-498f-acca-a230796e3d15",
+      "patente": "EKSB78",
+      "fechaHoraISO": "2026-05-08T18:53:46.973Z",
+      "fechaHoraLocal": "08-05-2026, 2:53:46 p. m.",
+      "latitud": -33.44438586233355,
+      "longitud": -70.65001572416041,
+      "precision": 55,
+      "ubicacionDisponible": true
+    },
+    {
+      "id": "b5f76c42-f462-4e72-929d-bb5325527bf2",
+      "patente": "EKSB78",
+      "fechaHoraISO": "2026-05-08T18:53:43.961Z",
+      "fechaHoraLocal": "08-05-2026, 2:53:43 p. m.",
+      "latitud": -33.44438586233355,
+      "longitud": -70.65001572416041,
+      "precision": 55,
+      "ubicacionDisponible": true
+    },
+    {
+      "id": "edee066b-23cd-479c-ba73-d5e3e5f985fa",
+      "patente": "GKSB78",
+      "fechaHoraISO": "2026-05-08T18:53:20.930Z",
+      "fechaHoraLocal": "08-05-2026, 2:53:20 p. m.",
+      "latitud": -33.4444014703523,
+      "longitud": -70.65000536900166,
+      "precision": 55,
+      "ubicacionDisponible": true
+    }
+  ]
+}
