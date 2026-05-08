@@ -159,7 +159,13 @@
         <button onclick="iniciarCamara()">Activar cámara</button>
         <button onclick="capturarDetectarYLeer()">Capturar y leer</button>
 
+        <button id="btnAuto" onclick="toggleCapturaAutomatica()">
+            Iniciar auto
+        </button>
+        <button onclick="borrarHistoria()">Borrar historia</button>
+
         <select id="intervaloCaptura">
+            <option value="3000" selected>Cada 3 seg.</option>
             <option value="5000">Cada 5 seg.</option>
             <option value="10000">Cada 10 seg.</option>
             <option value="15000">Cada 15 seg.</option>
@@ -167,15 +173,11 @@
             <option value="30000">Cada 30 seg.</option>
             <option value="60000">Cada 60 seg.</option>
         </select>
-
-        <button id="btnAuto" onclick="toggleCapturaAutomatica()">
-            Iniciar auto
-        </button>
-        <button onclick="borrarHistoria()">Borrar historia</button>
+        <div id="estado">Cargando modelo...</div>
+        <div id="resultado">Resultado...</div>
     </div>
 
-    <div id="estado">Cargando modelo...</div>
-    <div id="resultado">Resultado...</div>
+
 
     <canvas id="canvasOriginal" style="display:none;"></canvas>
     <canvas id="canvasModelo" style="display:none;"></canvas>
