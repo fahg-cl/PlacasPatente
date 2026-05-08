@@ -1,0 +1,28 @@
+﻿<div id="mapa" style="width:100%; height:350px;"></div>
+
+<script>
+  async function initMap() {
+    const ubicacion = {
+      lat: -33.4489,
+      lng: -70.6693
+    };
+
+    const mapa = new google.maps.Map(document.getElementById("mapa"), {
+      center: ubicacion,
+      zoom: 16,
+      mapId: "DEMO_MAP_ID"
+    });
+
+    const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+
+    new AdvancedMarkerElement({
+      map: mapa,
+      position: ubicacion,
+      title: "Patente detectada"
+    });
+  }
+</script>
+
+<script async
+        src="https://maps.googleapis.com/maps/api/js?key=TU_API_KEY&callback=initMap">
+</script>
