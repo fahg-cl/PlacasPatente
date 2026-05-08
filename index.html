@@ -198,9 +198,9 @@
         <h3>Mapa de patentes detectadas</h3>
         <div id="mapaPatentes"></div>
     </div>
-    <div class="control-grid">
-        <div id="estado">Cargando modelo...</div>
-    </div>
+
+    <div id="estado">Cargando modelo...</div>
+
 
     <div class="panel">
         <h3>Historial de sesión</h3>
@@ -388,10 +388,10 @@
             const marcador = L.marker([registro.latitud, registro.longitud])
                 .addTo(mapaPatentes)
                 .bindPopup(`
-                                                <strong>Patente:</strong> ${registro.patente}<br>
-                                                <strong>Fecha/Hora:</strong> ${registro.fechaHoraLocal}<br>
-                                                <strong>Precisión:</strong> ${registro.precision ? Math.round(registro.precision) + " metros" : "No disponible"}
-                                    `);
+                                                    <strong>Patente:</strong> ${registro.patente}<br>
+                                                    <strong>Fecha/Hora:</strong> ${registro.fechaHoraLocal}<br>
+                                                    <strong>Precisión:</strong> ${registro.precision ? Math.round(registro.precision) + " metros" : "No disponible"}
+                                        `);
 
             marcador.bindTooltip(registro.patente, {
                 permanent: false,
@@ -450,14 +450,14 @@
             }
 
             historialDiv.innerHTML = historial.map((r, index) => `
-                                            <div class="registro">
-                                            <div class="patente">${index + 1}. ${r.patente}</div>
-                                            <div><strong>Fecha/Hora:</strong> ${r.fechaHoraLocal}</div>
-                                            <div><strong>Latitud:</strong> ${r.latitud ?? "No disponible"}</div>
-                                            <div><strong>Longitud:</strong> ${r.longitud ?? "No disponible"}</div>
-                                            <div><strong>Precisión:</strong> ${r.precision ? Math.round(r.precision) + " metros" : "No disponible"}</div>
-                                            </div>
-                                            `).join("");
+                                                <div class="registro">
+                                                <div class="patente">${index + 1}. ${r.patente}</div>
+                                                <div><strong>Fecha/Hora:</strong> ${r.fechaHoraLocal}</div>
+                                                <div><strong>Latitud:</strong> ${r.latitud ?? "No disponible"}</div>
+                                                <div><strong>Longitud:</strong> ${r.longitud ?? "No disponible"}</div>
+                                                <div><strong>Precisión:</strong> ${r.precision ? Math.round(r.precision) + " metros" : "No disponible"}</div>
+                                                </div>
+                                                `).join("");
         }
 
         function limpiarHistorial() {
