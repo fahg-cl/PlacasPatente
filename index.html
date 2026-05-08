@@ -237,6 +237,8 @@
         const MODEL_SIZE = 640;
         const CONFIDENCE_THRESHOLD = 0.35;
 
+        const WORKER_URL = "https://guardar-historico-patentes.fahg76.workers.dev/";
+
         let mapaPatentes = null;
         let marcadoresPatentes = [];
 
@@ -281,58 +283,55 @@
             }
         }
 
-        function exportarHistoricoMensual() {
+        async function exportarHistoricoMensual() {
             if (!historial || historial.length === 0) {
                 resultado.innerText = "No existen registros para exportar.";
                 return;
             }
 
+            resultado.innerText = "Exportando histórico a GitHub...";
+
             const ahora = new Date();
             const yyyy = ahora.getFullYear();
             const mm = String(ahora.getMonth() + 1).padStart(2, "0");
 
-            const nombreArchivo = `${yyyy}-${mm}.json`;
+            const periodo = `${yyyy}-${mm}`;
 
             const registrosDelMes = historial.filter(r => {
                 const fecha = new Date(r.fechaHoraISO);
-                return (
-                    fecha.getFullYear() === yyyy &&
-                    fecha.getMonth() + 1 === Number(mm)
-                );
+                return fecha.getFullYear() === yyyy &&
+                    fecha.getMonth() + 1 === Number(mm);
             });
-
             if (registrosDelMes.length === 0) {
                 resultado.innerText = "No hay registros del mes actual para exportar.";
                 return;
             }
-
             const historico = {
-                periodo: `${yyyy}-${mm}`,
+                periodo,
                 totalRegistros: registrosDelMes.length,
                 fechaExportacion: new Date().toISOString(),
                 registros: registrosDelMes
             };
 
-            const blob = new Blob(
-                [JSON.stringify(historico, null, 2)],
-                { type: "application/json" }
-            );
+            const respuesta = await fetch(WORKER_URL, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(historico)
+            });
 
-            const url = URL.createObjectURL(blob);
+            const data = await respuesta.json();
 
-            const enlace = document.createElement("a");
-            enlace.href = url;
-            enlace.download = nombreArchivo;
+            if (!respuesta.ok || !data.ok) {
+                console.error(data);
+                resultado.innerText = "Error al exportar histórico.";
+                return;
+            }
 
-            document.body.appendChild(enlace);
-            enlace.click();
-            document.body.removeChild(enlace);
-
-            URL.revokeObjectURL(url);
-
-            resultado.innerText = `Archivo exportado: historico/${nombreArchivo}`;
+            resultado.innerText = `Histórico guardado: historico/${periodo}.json`;
         }
-
+       
         async function iniciarCamara() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({
@@ -476,6 +475,8 @@
         }
 
         function limpiarMarcadoresMapa() {
+            if (!mapaPatentes) return;
+
             marcadoresPatentes.forEach(marcador => {
                 mapaPatentes.removeLayer(marcador);
             });
