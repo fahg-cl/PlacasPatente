@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8" />
-    <title>Lector YOLO de Patentes</title>
+    <title>Lector Patentes</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
@@ -151,7 +151,7 @@
 
 <body>
 
-    <h2>Lector de Patentes con YOLO</h2>
+    <h2>Lector de Patentes</h2>
 
     <video id="video" autoplay playsinline></video>
 
@@ -249,7 +249,7 @@
         }
 
         async function cargarModelo() {
-            estado.innerText = "Cargando modelo YOLO...";
+            estado.innerText = "Cargando modelo...";
             resultado.innerText = "Esperando carga del modelo.";
 
             try {
@@ -257,7 +257,7 @@
                     executionProviders: ["wasm"]
                 });
 
-                estado.innerHTML = `✅ Modelo YOLO cargado correctamente.<br><small>Archivo: ${MODEL_PATH}</small><br><small>Input: ${session.inputNames[0]}</small><br><small>Output: ${session.outputNames[0]}</small>`;
+                estado.innerHTML = `✅ Modelo cargado correctamente.<br><small>Archivo: ${MODEL_PATH}</small><br><small>Input: ${session.inputNames[0]}</small><br><small>Output: ${session.outputNames[0]}</small>`;
                 resultado.innerText = "Modelo listo. Puedes activar la cámara.";
             } catch (error) {
                 console.error("Error cargando modelo:", error);
@@ -288,7 +288,7 @@
 
         async function capturarDetectarYLeer() {
             if (!session) {
-                resultado.innerText = "El modelo YOLO aún no está cargado o falló la carga.";
+                resultado.innerText = "El modelo aún no está cargado o falló la carga.";
                 return;
             }
 
