@@ -1,35 +1,45 @@
 {
   "periodo": "2026-05",
-  "totalRegistros": 3,
-  "fechaExportacion": "2026-05-08T19:46:08.684Z",
+  "totalRegistros": 4,
+  "fechaExportacion": "2026-05-08T19:47:48.382Z",
   "registros": [
     {
-      "id": "ececcafb-0d75-493e-a778-fd1634e3390e",
-      "patente": "EKSB75",
-      "fechaHoraISO": "2026-05-08T19:45:57.592Z",
-      "fechaHoraLocal": "08-05-2026, 3:45:57 p.m.",
-      "latitud": -33.44370651000971,
-      "longitud": -70.64944457996701,
-      "precision": 1414,
-      "ubicacionDisponible": true
-    },
-    {
-      "id": "31c1118c-b634-440c-82f5-08e1c1d37c8c",
+      "id": "197693ad-8804-4d2b-834d-c6c87ffcbd22",
       "patente": "GKSB78",
-      "fechaHoraISO": "2026-05-08T19:45:54.566Z",
-      "fechaHoraLocal": "08-05-2026, 3:45:54 p.m.",
-      "latitud": -33.44370651000971,
-      "longitud": -70.64944457996701,
+      "fechaHoraISO": "2026-05-08T19:47:40.096Z",
+      "fechaHoraLocal": "08-05-2026, 3:47:40 p.m.",
+      "latitud": -33.443706510001206,
+      "longitud": -70.6494445799959,
+      "precision": 1413.9968865253354,
+      "ubicacionDisponible": true
+    },
+    {
+      "id": "aa2fcb62-7649-472a-b663-dfae65eee8df",
+      "patente": "GKSB78",
+      "fechaHoraISO": "2026-05-08T19:47:34.139Z",
+      "fechaHoraLocal": "08-05-2026, 3:47:34 p.m.",
+      "latitud": -33.443706510001206,
+      "longitud": -70.64944457999592,
+      "precision": 1414.0000255826192,
+      "ubicacionDisponible": true
+    },
+    {
+      "id": "24848965-385e-4325-a899-84acf327b717",
+      "patente": "GKSB78",
+      "fechaHoraISO": "2026-05-08T19:47:31.139Z",
+      "fechaHoraLocal": "08-05-2026, 3:47:31 p.m.",
+      "latitud": -33.443706510001206,
+      "longitud": -70.64944457999592,
       "precision": 1414,
       "ubicacionDisponible": true
     },
     {
-      "id": "eb6297c4-d760-43b6-bc6f-ed335260c62d",
-      "patente": "EKSB78",
-      "fechaHoraISO": "2026-05-08T19:45:45.711Z",
-      "fechaHoraLocal": "08-05-2026, 3:45:45 p.m.",
-      "latitud": -33.44370651000971,
-      "longitud": -70.64944457996701,
+      "id": "dd631023-e4f2-4dfa-9433-4dfaf8782b25",
+      "patente": "GKSB78",
+      "fechaHoraISO": "2026-05-08T19:47:28.082Z",
+      "fechaHoraLocal": "08-05-2026, 3:47:28 p.m.",
+      "latitud": -33.44370651000241,
+      "longitud": -70.64944457999182,
       "precision": 1414,
       "ubicacionDisponible": true
     }
