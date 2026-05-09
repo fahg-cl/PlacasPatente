@@ -1,8 +1,18 @@
 {
   "periodo": "2026-05",
-  "totalRegistros": 49,
-  "fechaActualizacion": "2026-05-08T21:28:08.774Z",
+  "totalRegistros": 50,
+  "fechaActualizacion": "2026-05-09T07:31:45.556Z",
   "registros": [
+    {
+      "id": "efecc8cb-5fae-40b9-af4a-27c265bb1cdc",
+      "patente": "CTYB26",
+      "fechaHoraISO": "2026-05-08T22:10:56.417Z",
+      "fechaHoraLocal": "08-05-2026, 6:10:56 p.m.",
+      "latitud": -33.4934671370697,
+      "longitud": -70.65806039828668,
+      "precision": 3.529364144264478,
+      "ubicacionDisponible": true
+    },
     {
       "id": "55c4760a-e262-467c-a0ae-3eaaf0f52231",
       "patente": "MLRR65",
