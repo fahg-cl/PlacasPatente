@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿Aquí tienes el `index.html` completo actualizado con estilo oscuro e iconos en los botones:
+
+```html
+<!DOCTYPE html>
 <html lang="es">
 
 <head>
@@ -44,6 +47,135 @@
             font-size: 14px;
         }
 
+        video {
+            width: 100%;
+            max-width: 320px;
+            max-height: 220px;
+            object-fit: cover;
+            border-radius: 18px;
+            background: #000;
+            border: 1px solid #2b3944;
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55);
+        }
+
+        canvas {
+            width: 100%;
+            max-width: 320px;
+            border-radius: 12px;
+            background: #000;
+            margin-bottom: 8px;
+        }
+
+        .control-grid {
+            margin: 12px auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+            .control-grid button {
+                min-height: 92px;
+                border-radius: 22px;
+                border: 1px solid #26313a;
+                background: linear-gradient(145deg, #1b2229, #11171c);
+                color: white;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.04);
+            }
+
+                .control-grid button:active {
+                    transform: scale(0.97);
+                }
+
+        .btn-icon {
+            font-size: 26px;
+            line-height: 1;
+        }
+
+        .btn-text {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: linear-gradient(145deg, #43c85b, #20883b) !important;
+            border: 1px solid #5ef17b !important;
+        }
+
+        .btn-danger {
+            color: #ff6767 !important;
+        }
+
+        .auto-activo {
+            background: linear-gradient(145deg, #ff5252, #9f1d2a) !important;
+            border: 1px solid #ff7070 !important;
+        }
+
+        .panel {
+            max-width: 100%;
+            margin: 8px auto;
+            padding: 12px;
+            background: #12181e;
+            border: 1px solid #242f38;
+            border-radius: 18px;
+            text-align: left;
+            font-size: 13px;
+            box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35);
+        }
+
+        .interval-panel {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .interval-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: #1a2128;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            border: 1px solid #2d3943;
+        }
+
+        .interval-panel select {
+            flex: 1;
+            height: 48px;
+            border-radius: 14px;
+            border: 1px solid #2d3943;
+            background: #151b21;
+            color: white;
+            padding: 0 14px;
+            font-size: 14px;
+        }
+
+        #estado,
+        #resultado {
+            max-width: 320px;
+            margin: 8px auto;
+            padding: 10px;
+            background: #12181e;
+            color: #e9f0f6;
+            border: 1px solid #26313a;
+            border-radius: 14px;
+            font-weight: bold;
+            font-size: 13px;
+            text-align: center;
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
+        }
+
+        #resultado {
+            color: #5ef17b;
+        }
+
         .preview-container {
             display: flex;
             gap: 8px;
@@ -52,60 +184,6 @@
             flex-wrap: nowrap;
             max-width: 100%;
             margin: auto;
-        }
-
-        .control-grid {
-            max-width: 100%;
-            margin: 8px auto;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-        }
-
-        #mapaPatentes {
-            width: 100%;
-            height: 300px;
-            border-radius: 16px;
-            margin-top: 8px;
-            overflow: hidden;
-            filter: brightness(0.85) contrast(1.05);
-        }
-
-        .control-grid button,
-        .control-grid select {
-            width: 100%;
-            padding: 12px 8px;
-            border-radius: 14px;
-            font-size: 13px;
-            box-sizing: border-box;
-            min-height: 46px;
-        }
-
-        .control-grid button {
-            border: 1px solid #26313a;
-            background: linear-gradient(145deg, #1b2229, #11171c);
-            color: #ffffff;
-            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
-        }
-
-            .control-grid button:active {
-                transform: scale(0.98);
-            }
-
-        .control-grid select {
-            border: 1px solid #26313a;
-            background: #151b21;
-            color: #ffffff;
-        }
-
-        #btnAuto {
-            background: linear-gradient(145deg, #2fa84f, #1d7d38);
-            border: 1px solid #38c864;
-        }
-
-        .auto-activo {
-            background: linear-gradient(145deg, #e64646, #a91f2b) !important;
-            border: 1px solid #ff5a5a !important;
         }
 
         .preview-box {
@@ -133,54 +211,13 @@
                 border: 1px solid #2b3944;
             }
 
-        video {
+        #mapaPatentes {
             width: 100%;
-            max-width: 320px;
-            max-height: 220px;
-            object-fit: cover;
-            border-radius: 18px;
-            background: #000;
-            border: 1px solid #2b3944;
-            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55);
-        }
-
-        canvas {
-            width: 100%;
-            max-width: 320px;
-            border-radius: 12px;
-            background: #000;
-            margin-bottom: 8px;
-        }
-
-        #estado,
-        #resultado {
-            max-width: 320px;
-            margin: 0 auto;
-            padding: 10px;
-            background: #12181e;
-            color: #e9f0f6;
-            border: 1px solid #26313a;
-            border-radius: 14px;
-            font-weight: bold;
-            font-size: 13px;
-            text-align: center;
-            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
-        }
-
-        #resultado {
-            color: #5ef17b;
-        }
-
-        .panel {
-            max-width: 100%;
-            margin: 8px auto;
-            padding: 12px;
-            background: #12181e;
-            border: 1px solid #242f38;
-            border-radius: 18px;
-            text-align: left;
-            font-size: 13px;
-            box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35);
+            height: 300px;
+            border-radius: 16px;
+            margin-top: 8px;
+            overflow: hidden;
+            filter: brightness(0.85) contrast(1.05);
         }
 
         .registro {
@@ -199,13 +236,15 @@
         }
 
         .export-btn {
-            background: linear-gradient(145deg, #3fb950, #238636) !important;
-            border: 1px solid #56d364 !important;
+            width: 100%;
+            min-height: 52px;
+            border-radius: 16px;
+            border: 1px solid #56d364;
+            background: linear-gradient(145deg, #3fb950, #238636);
+            color: white;
             font-weight: bold;
-        }
-
-        .danger-btn {
-            color: #ff6b6b !important;
+            font-size: 14px;
+            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45);
         }
 
         .leaflet-control-zoom a {
@@ -223,11 +262,31 @@
     <video id="video" autoplay playsinline></video>
 
     <div class="control-grid">
-        <button onclick="iniciarCamara()">Activar cámara</button>
-        <button onclick="capturarDetectarYLeer()">Capturar y leer</button>
 
-        <button id="btnAuto" onclick="toggleCapturaAutomatica()">Iniciar auto</button>
-        <button class="danger-btn" onclick="borrarHistoria()">Borrar historia</button>
+        <button onclick="iniciarCamara()">
+            <div class="btn-icon">📷</div>
+            <div class="btn-text">Activar cámara</div>
+        </button>
+
+        <button onclick="capturarDetectarYLeer()" class="btn-primary">
+            <div class="btn-icon">📸</div>
+            <div class="btn-text">Capturar y leer</div>
+        </button>
+
+        <button id="btnAuto" onclick="toggleCapturaAutomatica()">
+            <div class="btn-icon">▶️</div>
+            <div class="btn-text">Iniciar auto</div>
+        </button>
+
+        <button onclick="borrarHistoria()" class="btn-danger">
+            <div class="btn-icon">🗑️</div>
+            <div class="btn-text">Borrar historia</div>
+        </button>
+
+    </div>
+
+    <div class="panel interval-panel">
+        <div class="interval-icon">⏱️</div>
 
         <select id="intervaloCaptura">
             <option value="3000" selected>Cada 3 seg.</option>
@@ -238,9 +297,9 @@
             <option value="30000">Cada 30 seg.</option>
             <option value="60000">Cada 60 seg.</option>
         </select>
-
-        <div id="resultado">Resultado...</div>
     </div>
+
+    <div id="resultado">Resultado...</div>
 
     <canvas id="canvasOriginal" style="display:none;"></canvas>
     <canvas id="canvasModelo" style="display:none;"></canvas>
@@ -262,10 +321,11 @@
         <div id="mapaPatentes"></div>
     </div>
 
-    <div class="control-grid">
-        <div id="estado">Cargando modelo...</div>
-        <button class="export-btn" onclick="exportarHistoricoMensual()">Exportar histórico JSON</button>
-    </div>
+    <div id="estado">Cargando modelo...</div>
+
+    <button class="export-btn" onclick="exportarHistoricoMensual()">
+        Exportar histórico JSON
+    </button>
 
     <div class="panel">
         <h3>Historial de sesión</h3>
@@ -768,7 +828,12 @@
             const intervalo = Number(document.getElementById("intervaloCaptura").value);
 
             resultado.innerText = `Auto cada ${intervalo / 1000} seg.`;
-            btnAuto.innerText = "Detener auto";
+
+            btnAuto.innerHTML = `
+                    <div class="btn-icon">⏹️</div>
+                    <div class="btn-text">Detener auto</div>
+                `;
+
             btnAuto.classList.add("auto-activo");
 
             capturarDetectarYLeer();
@@ -782,7 +847,11 @@
             clearInterval(capturaAutomaticaTimer);
             capturaAutomaticaTimer = null;
 
-            btnAuto.innerText = "Iniciar auto";
+            btnAuto.innerHTML = `
+                    <div class="btn-icon">▶️</div>
+                    <div class="btn-text">Iniciar auto</div>
+                `;
+
             btnAuto.classList.remove("auto-activo");
 
             resultado.innerText = "Auto detenido.";
@@ -796,3 +865,4 @@
 </body>
 
 </html>
+```
