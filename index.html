@@ -5,20 +5,15 @@
     <meta charset="UTF-8" />
     <title>Lector Patentes</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- Iconos para iPhone / iPad -->
-    <link rel="apple-touch-icon" href="icons/icon.png">
 
-    <!-- Iconos generales -->
+    <link rel="apple-touch-icon" href="icons/icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="icons/icon.png">
     <link rel="icon" type="image/png" sizes="16x16" href="icons/icon.png">
 
-    <!-- Configuración para pantalla de inicio en iOS -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="Patentes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
-    <!-- Configuración general PWA -->
-    <meta name="theme-color" content="#0b5ed7">
+    <meta name="theme-color" content="#0b0f12">
 
     <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -28,7 +23,8 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background: #f4f4f4;
+            background: #0b0f12;
+            color: #f4f6f8;
             padding: 4px;
             text-align: center;
             margin: 0;
@@ -37,6 +33,15 @@
         h2,
         h3 {
             margin: 8px 0;
+        }
+
+        h2 {
+            font-size: 20px;
+        }
+
+        h3 {
+            color: #d6dde5;
+            font-size: 14px;
         }
 
         .preview-container {
@@ -60,38 +65,62 @@
         #mapaPatentes {
             width: 100%;
             height: 300px;
-            border-radius: 12px;
+            border-radius: 16px;
             margin-top: 8px;
+            overflow: hidden;
+            filter: brightness(0.85) contrast(1.05);
         }
 
         .control-grid button,
         .control-grid select {
             width: 100%;
-            padding: 11px 8px;
-            border-radius: 10px;
+            padding: 12px 8px;
+            border-radius: 14px;
             font-size: 13px;
             box-sizing: border-box;
+            min-height: 46px;
         }
 
         .control-grid button {
-            border: none;
-            background: #0b5ed7;
-            color: white;
+            border: 1px solid #26313a;
+            background: linear-gradient(145deg, #1b2229, #11171c);
+            color: #ffffff;
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
         }
 
+            .control-grid button:active {
+                transform: scale(0.98);
+            }
+
         .control-grid select {
-            border: 1px solid #ccc;
-            background: white;
+            border: 1px solid #26313a;
+            background: #151b21;
+            color: #ffffff;
+        }
+
+        #btnAuto {
+            background: linear-gradient(145deg, #2fa84f, #1d7d38);
+            border: 1px solid #38c864;
+        }
+
+        .auto-activo {
+            background: linear-gradient(145deg, #e64646, #a91f2b) !important;
+            border: 1px solid #ff5a5a !important;
         }
 
         .preview-box {
             flex: 1;
             min-width: 0;
+            background: #12181e;
+            border: 1px solid #242f38;
+            border-radius: 16px;
+            padding: 8px;
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
         }
 
             .preview-box h3 {
                 font-size: 13px;
-                margin: 4px 0;
+                margin: 4px 0 8px;
             }
 
             .preview-box canvas {
@@ -101,6 +130,7 @@
                 object-fit: contain;
                 border-radius: 10px;
                 background: #000;
+                border: 1px solid #2b3944;
             }
 
         video {
@@ -108,8 +138,10 @@
             max-width: 320px;
             max-height: 220px;
             object-fit: cover;
-            border-radius: 12px;
+            border-radius: 18px;
             background: #000;
+            border: 1px solid #2b3944;
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55);
         }
 
         canvas {
@@ -120,35 +152,40 @@
             margin-bottom: 8px;
         }
 
-
         #estado,
         #resultado {
             max-width: 320px;
-            margin: 8px auto;
+            margin: 0 auto;
             padding: 10px;
-            background: white;
-            border-radius: 12px;
+            background: #12181e;
+            color: #e9f0f6;
+            border: 1px solid #26313a;
+            border-radius: 14px;
             font-weight: bold;
-            font-size: 14px;
+            font-size: 13px;
+            text-align: center;
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
+        }
+
+        #resultado {
+            color: #5ef17b;
         }
 
         .panel {
             max-width: 100%;
             margin: 8px auto;
-            padding: 10px;
-            background: white;
-            border-radius: 12px;
+            padding: 12px;
+            background: #12181e;
+            border: 1px solid #242f38;
+            border-radius: 18px;
             text-align: left;
             font-size: 13px;
-        }
-
-        .auto-activo {
-            background: #dc3545 !important;
+            box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35);
         }
 
         .registro {
-            border-bottom: 1px solid #ddd;
-            padding: 8px 0;
+            border-bottom: 1px solid #25313b;
+            padding: 10px 0;
         }
 
             .registro:last-child {
@@ -158,7 +195,23 @@
         .patente {
             font-size: 18px;
             font-weight: bold;
-            color: #0b5ed7;
+            color: #5ef17b;
+        }
+
+        .export-btn {
+            background: linear-gradient(145deg, #3fb950, #238636) !important;
+            border: 1px solid #56d364 !important;
+            font-weight: bold;
+        }
+
+        .danger-btn {
+            color: #ff6b6b !important;
+        }
+
+        .leaflet-control-zoom a {
+            background: #11171c !important;
+            color: #ffffff !important;
+            border-color: #26313a !important;
         }
     </style>
 </head>
@@ -173,10 +226,8 @@
         <button onclick="iniciarCamara()">Activar cámara</button>
         <button onclick="capturarDetectarYLeer()">Capturar y leer</button>
 
-        <button id="btnAuto" onclick="toggleCapturaAutomatica()">
-            Iniciar auto
-        </button>
-        <button onclick="borrarHistoria()">Borrar historia</button>
+        <button id="btnAuto" onclick="toggleCapturaAutomatica()">Iniciar auto</button>
+        <button class="danger-btn" onclick="borrarHistoria()">Borrar historia</button>
 
         <select id="intervaloCaptura">
             <option value="3000" selected>Cada 3 seg.</option>
@@ -187,15 +238,14 @@
             <option value="30000">Cada 30 seg.</option>
             <option value="60000">Cada 60 seg.</option>
         </select>
+
         <div id="resultado">Resultado...</div>
     </div>
-
 
     <canvas id="canvasOriginal" style="display:none;"></canvas>
     <canvas id="canvasModelo" style="display:none;"></canvas>
 
     <div class="preview-container">
-
         <div class="preview-box">
             <h3>Detección</h3>
             <canvas id="canvasPreview"></canvas>
@@ -205,23 +255,22 @@
             <h3>Recorte patente</h3>
             <canvas id="canvasRecorte"></canvas>
         </div>
-
     </div>
 
     <div class="panel">
         <h3>Mapa de patentes detectadas</h3>
         <div id="mapaPatentes"></div>
     </div>
+
     <div class="control-grid">
         <div id="estado">Cargando modelo...</div>
-        <button onclick="exportarHistoricoMensual()">Exportar histórico JSON</button>
+        <button class="export-btn" onclick="exportarHistoricoMensual()">Exportar histórico JSON</button>
     </div>
+
     <div class="panel">
         <h3>Historial de sesión</h3>
         <div id="historial">Sin registros.</div>
     </div>
-
-
 
     <script>
         const video = document.getElementById("video");
@@ -236,13 +285,12 @@
         const MODEL_PATH = "./model/license_plate.onnx";
         const MODEL_SIZE = 640;
         const CONFIDENCE_THRESHOLD = 0.35;
-
         const WORKER_URL = "https://guardar-historico-patentes.fahg76.workers.dev/";
 
         let mapaPatentes = null;
         let marcadoresPatentes = [];
-
         let session = null;
+
         const STORAGE_KEY = "historial_patentes_yolo";
         let historial = cargarHistorialDesdeLocalStorage();
         let capturaAutomaticaTimer = null;
@@ -250,7 +298,6 @@
         const btnAuto = document.getElementById("btnAuto");
 
         actualizarHistorial();
-
         cargarModelo();
 
         function inicializarMapa() {
@@ -266,85 +313,32 @@
 
         async function cargarModelo() {
             estado.innerText = "Cargando modelo...";
-            resultado.innerText = "Esperando carga del modelo.";
+            resultado.innerText = "Esperando modelo.";
 
             try {
                 session = await ort.InferenceSession.create(MODEL_PATH, {
                     executionProviders: ["wasm"]
                 });
 
-                estado.innerHTML = `✅ Modelo cargado correctamente.<br><small>Archivo: ${MODEL_PATH}</small><br><small>Input: ${session.inputNames[0]}</small><br><small>Output: ${session.outputNames[0]}</small>`;
-                resultado.innerText = "Modelo listo. Puedes activar la cámara.";
+                estado.innerHTML = `✅ Modelo listo<br><small>${session.inputNames[0]} / ${session.outputNames[0]}</small>`;
+                resultado.innerText = "Modelo listo.";
             } catch (error) {
                 console.error("Error cargando modelo:", error);
-
-                estado.innerHTML = `❌ No se pudo cargar el modelo ONNX.<br><small>Revisa que exista: ${MODEL_PATH}</small>`;
-                resultado.innerText = "Error al cargar el modelo.";
+                estado.innerHTML = `❌ Error modelo<br><small>Revisa ${MODEL_PATH}</small>`;
+                resultado.innerText = "Error al cargar.";
             }
         }
 
-       /* async function exportarHistoricoMensual() {
-            if (!historial || historial.length === 0) {
-                resultado.innerText = "No existen registros para exportar.";
-                return;
-            }
-
-            resultado.innerText = "Exportando histórico a GitHub...";
-
-            const ahora = new Date();
-            const yyyy = ahora.getFullYear();
-            const mm = String(ahora.getMonth() + 1).padStart(2, "0");
-
-            const periodo = `${yyyy}-${mm}`;
-
-            const registrosDelMes = historial.filter(r => {
-                const fecha = new Date(r.fechaHoraISO);
-                return fecha.getFullYear() === yyyy &&
-                    fecha.getMonth() + 1 === Number(mm);
-            });
-            if (registrosDelMes.length === 0) {
-                resultado.innerText = "No hay registros del mes actual para exportar.";
-                return;
-            }
-            const historico = {
-                periodo,
-                totalRegistros: registrosDelMes.length,
-                fechaExportacion: new Date().toISOString(),
-                registros: registrosDelMes
-            };
-
-            const respuesta = await fetch(WORKER_URL, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(historico)
-            });
-
-            const data = await respuesta.json();
-
-            if (!respuesta.ok || !data.ok) {
-                console.error(data);
-                resultado.innerText = "Error al exportar histórico.";
-                return;
-            }
-
-            resultado.innerText = `Histórico guardado: historico/${periodo}.json`;
-        }
-        */
         async function exportarHistoricoMensual() {
             try {
                 if (!historial || historial.length === 0) {
-                    resultado.innerText = "No existen registros para exportar.";
+                    resultado.innerText = "No hay registros.";
                     return;
                 }
-
-                resultado.innerText = "Preparando histórico...";
 
                 const ahora = new Date();
                 const yyyy = ahora.getFullYear();
                 const mm = String(ahora.getMonth() + 1).padStart(2, "0");
-
                 const periodo = `${yyyy}-${mm}`;
 
                 const registrosDelMes = historial.filter(r => {
@@ -354,7 +348,7 @@
                 });
 
                 if (registrosDelMes.length === 0) {
-                    resultado.innerText = "No hay registros del mes actual para exportar.";
+                    resultado.innerText = "Sin registros del mes.";
                     return;
                 }
 
@@ -365,10 +359,7 @@
                     registros: registrosDelMes
                 };
 
-                console.log("Enviando a Worker:", WORKER_URL);
-                console.log("Payload:", historico);
-
-                resultado.innerText = "Enviando histórico al Worker...";
+                resultado.innerText = "Exportando...";
 
                 const respuesta = await fetch(WORKER_URL, {
                     method: "POST",
@@ -379,33 +370,28 @@
                 });
 
                 const textoRespuesta = await respuesta.text();
-
-                console.log("Status Worker:", respuesta.status);
-                console.log("Respuesta Worker:", textoRespuesta);
-
                 let data = null;
 
                 try {
                     data = JSON.parse(textoRespuesta);
                 } catch (e) {
-                    resultado.innerText = "El Worker respondió, pero no devolvió JSON válido.";
+                    resultado.innerText = "Worker sin JSON válido.";
                     return;
                 }
 
                 if (!respuesta.ok || !data.ok) {
-                    resultado.innerText = `Error al exportar. Status: ${respuesta.status}`;
                     console.error("Detalle error:", data);
+                    resultado.innerText = `Error exportación: ${respuesta.status}`;
                     return;
                 }
 
-                resultado.innerText = `Histórico guardado: historico/${periodo}.json`;
+                resultado.innerText = `Exportado: ${periodo}.json`;
 
             } catch (error) {
                 console.error("Error exportando histórico:", error);
-                resultado.innerText = `Error de conexión con Worker: ${error.message}`;
+                resultado.innerText = "Error conexión Worker.";
             }
         }
-
 
         async function iniciarCamara() {
             try {
@@ -421,23 +407,23 @@
                 video.srcObject = stream;
                 resultado.innerText = "Cámara activa.";
             } catch (error) {
-                resultado.innerText = "No se pudo acceder a la cámara.";
+                resultado.innerText = "Error cámara.";
                 console.error(error);
             }
         }
 
         async function capturarDetectarYLeer() {
             if (!session) {
-                resultado.innerText = "El modelo aún no está cargado o falló la carga.";
+                resultado.innerText = "Modelo no cargado.";
                 return;
             }
 
             if (!video.videoWidth || !video.videoHeight) {
-                resultado.innerText = "Primero activa la cámara.";
+                resultado.innerText = "Activa la cámara.";
                 return;
             }
 
-            resultado.innerText = "Detectando patente...";
+            resultado.innerText = "Detectando...";
 
             const ctx = canvasOriginal.getContext("2d");
             canvasOriginal.width = video.videoWidth;
@@ -447,14 +433,14 @@
             const deteccion = await detectarPatenteYOLO(canvasOriginal);
 
             if (!deteccion) {
-                resultado.innerText = "No se detectó una patente.";
+                resultado.innerText = "No detectada.";
                 return;
             }
 
             dibujarDeteccion(canvasOriginal, deteccion);
             recortarPatente(canvasOriginal, deteccion);
 
-            resultado.innerText = "Leyendo patente...";
+            resultado.innerText = "Leyendo...";
 
             const imagenRecorte = canvasRecorte.toDataURL("image/png");
 
@@ -474,16 +460,15 @@
                 const patente = extraerPatente(texto);
 
                 if (!patente) {
-                    resultado.innerText = "Texto detectado, pero no parece una patente válida.";
+                    resultado.innerText = "Texto no válido.";
                     return;
                 }
 
-                resultado.innerText = `Patente reconocida: ${patente}`;
-
+                resultado.innerText = `Detectada: ${patente}`;
                 await registrarLectura(patente);
 
             } catch (error) {
-                resultado.innerText = "Error al leer el texto.";
+                resultado.innerText = "Error OCR.";
                 console.error(error);
             }
         }
@@ -528,10 +513,10 @@
             const marcador = L.marker([registro.latitud, registro.longitud])
                 .addTo(mapaPatentes)
                 .bindPopup(`
-                                                                    <strong>Patente:</strong> ${registro.patente}<br>
-                                                                    <strong>Fecha/Hora:</strong> ${registro.fechaHoraLocal}<br>
-                                                                    <strong>Precisión:</strong> ${registro.precision ? Math.round(registro.precision) + " metros" : "No disponible"}
-                                                        `);
+                        <strong>Patente:</strong> ${registro.patente}<br>
+                        <strong>Fecha/Hora:</strong> ${registro.fechaHoraLocal}<br>
+                        <strong>Precisión:</strong> ${registro.precision ? Math.round(registro.precision) + " metros" : "No disponible"}
+                    `);
 
             marcador.bindTooltip(registro.patente, {
                 permanent: false,
@@ -539,7 +524,6 @@
             });
 
             marcadoresPatentes.push(marcador);
-
             mapaPatentes.setView([registro.latitud, registro.longitud], 16);
         }
 
@@ -592,30 +576,20 @@
             }
 
             historialDiv.innerHTML = historial.map((r, index) => `
-                                                                <div class="registro">
-                                                                <div class="patente">${index + 1}. ${r.patente}</div>
-                                                                <div><strong>Fecha/Hora:</strong> ${r.fechaHoraLocal}</div>
-                                                                <div><strong>Latitud:</strong> ${r.latitud ?? "No disponible"}</div>
-                                                                <div><strong>Longitud:</strong> ${r.longitud ?? "No disponible"}</div>
-                                                                <div><strong>Precisión:</strong> ${r.precision ? Math.round(r.precision) + " metros" : "No disponible"}</div>
-                                                                </div>
-                                                                `).join("");
-        }
-
-        function limpiarHistorial() {
-            historial = [];
-            actualizarHistorial();
-            resultado.innerText = "Historial limpiado.";
+                    <div class="registro">
+                        <div class="patente">${index + 1}. ${r.patente}</div>
+                        <div><strong>Fecha/Hora:</strong> ${r.fechaHoraLocal}</div>
+                        <div><strong>Latitud:</strong> ${r.latitud ?? "No disponible"}</div>
+                        <div><strong>Longitud:</strong> ${r.longitud ?? "No disponible"}</div>
+                        <div><strong>Precisión:</strong> ${r.precision ? Math.round(r.precision) + " metros" : "No disponible"}</div>
+                    </div>
+                `).join("");
         }
 
         async function detectarPatenteYOLO(canvas) {
             const inputTensor = prepararImagenParaYOLO(canvas);
-
             const inputName = session.inputNames[0];
-            const outputs = await session.run({
-                [inputName]: inputTensor
-            });
-
+            const outputs = await session.run({ [inputName]: inputTensor });
             const outputName = session.outputNames[0];
             const output = outputs[outputName];
 
@@ -690,11 +664,11 @@
             ctx.drawImage(canvas, 0, 0);
 
             ctx.lineWidth = 6;
-            ctx.strokeStyle = "lime";
+            ctx.strokeStyle = "#38e66b";
             ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
 
             ctx.font = "28px Arial";
-            ctx.fillStyle = "lime";
+            ctx.fillStyle = "#38e66b";
             ctx.fillText(
                 `Patente ${(rect.confidence * 100).toFixed(1)}%`,
                 rect.x,
@@ -791,14 +765,9 @@
         }
 
         function iniciarCapturaAutomatica() {
+            const intervalo = Number(document.getElementById("intervaloCaptura").value);
 
-            const intervalo = Number(
-                document.getElementById("intervaloCaptura").value
-            );
-
-            resultado.innerText =
-                `Captura automática iniciada cada ${intervalo / 1000} segundos.`;
-
+            resultado.innerText = `Auto cada ${intervalo / 1000} seg.`;
             btnAuto.innerText = "Detener auto";
             btnAuto.classList.add("auto-activo");
 
@@ -810,14 +779,13 @@
         }
 
         function detenerCapturaAutomatica() {
-
             clearInterval(capturaAutomaticaTimer);
             capturaAutomaticaTimer = null;
 
             btnAuto.innerText = "Iniciar auto";
             btnAuto.classList.remove("auto-activo");
 
-            resultado.innerText = "Captura automática detenida.";
+            resultado.innerText = "Auto detenido.";
         }
 
         window.addEventListener("load", () => {
