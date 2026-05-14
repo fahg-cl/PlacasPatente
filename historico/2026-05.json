@@ -1,8 +1,28 @@
 {
   "periodo": "2026-05",
-  "totalRegistros": 52,
-  "fechaActualizacion": "2026-05-13T15:36:36.857Z",
+  "totalRegistros": 54,
+  "fechaActualizacion": "2026-05-14T15:37:08.986Z",
   "registros": [
+    {
+      "id": "a9c54d76-7e21-4412-8b6e-9a9769a9feb5",
+      "patente": "KS8783",
+      "fechaHoraISO": "2026-05-14T12:49:44.089Z",
+      "fechaHoraLocal": "14-05-2026, 8:49:44 a.m.",
+      "latitud": -33.44438401958575,
+      "longitud": -70.64965763125215,
+      "precision": 38.190408942093114,
+      "ubicacionDisponible": true
+    },
+    {
+      "id": "d694f818-c991-48b3-9415-1aa08facf4e8",
+      "patente": "GKSB78",
+      "fechaHoraISO": "2026-05-14T12:49:41.305Z",
+      "fechaHoraLocal": "14-05-2026, 8:49:41 a.m.",
+      "latitud": -33.44438401958575,
+      "longitud": -70.64965763125215,
+      "precision": 38.190408942093114,
+      "ubicacionDisponible": true
+    },
     {
       "id": "e5f3a024-b51c-4a42-9d97-d3a92a602e3e",
       "patente": "GKSB78",
