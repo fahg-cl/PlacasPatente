@@ -273,6 +273,54 @@
             font-weight: bold;
             font-size: 14px;
         }
+
+.interval-card {
+    min-height: 92px;
+    border-radius: 22px;
+    border: 1px solid #26313a;
+    background: linear-gradient(145deg, #1b2229, #11171c);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.interval-card select {
+    width: 86%;
+    height: 30px;
+    border-radius: 10px;
+    border: 1px solid #2d3943;
+    background: #151b21;
+    color: white;
+    font-size: 12px;
+    text-align: center;
+}
+
+.placa-patente {
+    width: 220px;
+    margin: 8px auto 10px;
+    padding: 10px 12px;
+    background: #ffffff;
+    color: #111111;
+    border: 4px solid #111111;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 34px;
+    font-weight: 900;
+    letter-spacing: 4px;
+    font-family: Arial Black, Arial, sans-serif;
+    box-shadow: 0 4px 0 #000;
+}
+
+.datos-referencia {
+    margin-top: 8px;
+    font-size: 11px;
+    color: #aeb8c2;
+    line-height: 1.5;
+    text-align: center;
+}
     </style>
 </head>
 
@@ -337,19 +385,20 @@
 
             
 
-            <div class="panel interval-panel">
-                <div class="interval-icon">⏱️</div>
+<div class="interval-card">
+    <div class="btn-icon">⏱️</div>
+    <div class="btn-text">Intervalo</div>
 
-                <select id="intervaloCaptura">
-                    <option value="3000">Cada 3 seg.</option>
-                    <option value="5000">Cada 5 seg.</option>
-                    <option value="10000">Cada 10 seg.</option>
-                    <option value="15000">Cada 15 seg.</option>
-                    <option value="20000">Cada 20 seg.</option>
-                    <option value="30000">Cada 30 seg.</option>
-                    <option value="60000">Cada 60 seg.</option>
-                </select>
-            </div>
+    <select id="intervaloCaptura">
+        <option value="3000">Cada 3 seg.</option>
+        <option value="5000">Cada 5 seg.</option>
+        <option value="10000">Cada 10 seg.</option>
+        <option value="15000">Cada 15 seg.</option>
+        <option value="20000">Cada 20 seg.</option>
+        <option value="30000">Cada 30 seg.</option>
+        <option value="60000">Cada 60 seg.</option>
+    </select>
+</div>
 </div>
         </section>
 
@@ -799,15 +848,18 @@
         });
     }
 
-    function actualizarDatosDetectados(registro) {
-        datosDetectadosDiv.innerHTML = `
-            <div><strong>Patente:</strong> <span class="patente">${registro.patente}</span></div>
+function actualizarDatosDetectados(registro) {
+    datosDetectadosDiv.innerHTML = `
+        <div class="placa-patente">${registro.patente}</div>
+
+        <div class="datos-referencia">
             <div><strong>Fecha/Hora:</strong> ${registro.fechaHoraLocal}</div>
             <div><strong>Latitud:</strong> ${registro.latitud ?? "No disponible"}</div>
             <div><strong>Longitud:</strong> ${registro.longitud ?? "No disponible"}</div>
             <div><strong>Precisión:</strong> ${registro.precision ? Math.round(registro.precision) + " metros" : "No disponible"}</div>
-        `;
-    }
+        </div>
+    `;
+}
 
     function inicializarMapa() {
         mapaPatentes = L.map("mapaPatentes").setView([-33.4489, -70.6693], 12);
