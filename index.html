@@ -338,6 +338,152 @@
                 color: white;
             }
 
+
+        @media screen and (orientation: landscape) and (max-height: 500px) {
+
+            .app-header {
+                height: 44px;
+            }
+
+            main {
+                padding: 4px;
+            }
+
+            #pagina1.activa {
+                display: grid;
+                grid-template-columns: 38% 30% 32%;
+                gap: 6px;
+                align-items: start;
+            }
+
+            #pagina1 video {
+                grid-column: 1;
+                width: 100%;
+                max-width: none;
+                max-height: calc(100vh - 60px);
+                height: calc(100vh - 70px);
+            }
+
+            .zoom-controls {
+                grid-column: 1;
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                margin: 4px 0;
+            }
+
+            #resultado {
+                grid-column: 2;
+                margin: 0 0 6px 0;
+                max-width: none;
+            }
+
+            .preview-container {
+                grid-column: 2;
+                flex-direction: column;
+                gap: 6px;
+            }
+
+            .preview-box {
+                padding: 6px;
+            }
+
+                .preview-box h3 {
+                    margin: 2px 0 4px;
+                    font-size: 11px;
+                }
+
+                .preview-box canvas {
+                    max-width: 100%;
+                    max-height: 72px;
+                }
+
+            #pagina1 .panel {
+                grid-column: 3;
+                margin: 0 0 6px 0;
+                padding: 8px;
+            }
+
+            .placa-patente {
+                width: 170px;
+                font-size: 26px;
+                padding: 6px 8px;
+                letter-spacing: 3px;
+            }
+
+            .datos-referencia {
+                font-size: 10px;
+            }
+
+            .control-grid {
+                grid-column: 3;
+                margin: 0;
+                gap: 6px;
+            }
+
+                .control-grid button,
+                .interval-card {
+                    min-height: 70px;
+                    border-radius: 16px;
+                }
+
+            .btn-icon {
+                font-size: 20px;
+            }
+
+            .btn-text {
+                font-size: 11px;
+            }
+
+            .interval-card select {
+                height: 26px;
+                font-size: 10px;
+            }
+
+            #pagina2.activa {
+                height: calc(100vh - 54px);
+            }
+
+            #pagina2 h2 {
+                display: none;
+            }
+
+            #pagina2 .panel {
+                height: calc(100vh - 60px);
+                margin: 0;
+                padding: 4px;
+            }
+
+            #mapaPatentes {
+                height: 100%;
+            }
+
+            #pagina3.activa {
+                display: grid;
+                grid-template-columns: 35% 65%;
+                gap: 8px;
+            }
+
+            #pagina3 h2 {
+                display: none;
+            }
+
+            #estado,
+            #pagina3 .control-grid,
+            #pagina3 .panel:last-child {
+                margin-top: 0;
+            }
+
+            #pagina3 .control-grid {
+                grid-column: 1;
+            }
+
+            #pagina3 .panel {
+                grid-column: 2;
+                max-height: calc(100vh - 70px);
+                overflow-y: auto;
+            }
+        }
+
     </style>
 </head>
 
@@ -358,9 +504,6 @@
 
         <!-- PAGINA 1 -->
         <section id="pagina1" class="pagina activa">
-
-            <h2>Lector de Patentes</h2>
-
             <video id="video" autoplay playsinline></video>
 
             <div class="zoom-controls">
