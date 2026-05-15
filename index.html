@@ -339,110 +339,139 @@
             }
 
 
+
         @media screen and (orientation: landscape) and (max-height: 500px) {
 
-            main {
-                padding: 4px;
+            .app-header {
+                height: 48px;
             }
 
-            .app-header {
-                height: 44px;
+            main {
+                padding: 6px;
             }
 
             #pagina1.activa {
                 display: grid;
-                grid-template-columns: 38% 30% 32%;
-                grid-template-rows: auto auto auto;
-                gap: 6px;
-                align-items: start;
+                grid-template-columns: 37% 29% 34%;
+                grid-template-rows: 64px 1fr;
+                gap: 8px;
+                align-items: stretch;
+                height: calc(100vh - 60px);
             }
 
             #pagina1 video {
                 grid-column: 1;
-                grid-row: 1 / span 3;
+                grid-row: 1 / span 2;
                 width: 100%;
                 max-width: none;
-                height: calc(100vh - 58px);
+                height: 100%;
                 max-height: none;
+                object-fit: cover;
             }
 
             #pagina1 .zoom-controls {
                 grid-column: 1;
-                grid-row: 3;
+                grid-row: 2;
                 align-self: end;
                 z-index: 2;
-                margin: 0 6px 6px;
+                margin: 0 10px 10px;
                 display: grid;
                 grid-template-columns: repeat(4, 1fr);
+                gap: 10px;
             }
+
+                #pagina1 .zoom-controls button {
+                    width: 100%;
+                    height: 48px;
+                    font-size: 15px;
+                }
 
             #resultado {
                 grid-column: 2;
                 grid-row: 1;
                 max-width: none;
                 margin: 0;
+                min-height: 48px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 17px;
             }
 
             #pagina1 .preview-container {
                 grid-column: 2;
-                grid-row: 2 / span 2;
-                display: flex;
-                flex-direction: column;
-                gap: 6px;
+                grid-row: 2;
+                display: grid;
+                grid-template-rows: 1fr 1fr;
+                gap: 8px;
                 margin: 0;
+                height: 100%;
             }
 
             #pagina1 .preview-box {
-                padding: 6px;
+                padding: 8px;
+                display: flex;
+                flex-direction: column;
+                justify-content: stretch;
+                min-height: 0;
             }
 
                 #pagina1 .preview-box h3 {
-                    margin: 2px 0 4px;
-                    font-size: 11px;
+                    margin: 0 0 6px;
+                    font-size: 13px;
                 }
 
                 #pagina1 .preview-box canvas {
-                    max-width: 100%;
-                    max-height: 82px;
+                    width: 100%;
+                    max-width: none;
+                    height: 100%;
+                    max-height: none;
+                    object-fit: contain;
+                    flex: 1;
                 }
 
             #pagina1 .panel {
                 grid-column: 3;
                 grid-row: 1;
                 margin: 0;
-                padding: 8px;
+                padding: 10px;
             }
 
             #pagina1 .control-grid {
                 grid-column: 3;
-                grid-row: 2 / span 2;
+                grid-row: 2;
                 margin: 0;
-                gap: 6px;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+                height: 100%;
             }
 
                 #pagina1 .control-grid button,
                 #pagina1 .interval-card {
-                    min-height: 68px;
-                    border-radius: 16px;
+                    min-height: 0;
+                    height: 100%;
+                    border-radius: 18px;
                 }
 
             .btn-icon {
-                font-size: 20px;
+                font-size: 28px;
             }
 
             .btn-text {
-                font-size: 11px;
+                font-size: 14px;
             }
 
             .interval-card select {
-                height: 26px;
-                font-size: 10px;
+                width: 88%;
+                height: 34px;
+                font-size: 13px;
             }
 
             .placa-patente {
-                width: 160px;
-                font-size: 24px;
-                padding: 6px 8px;
+                width: 190px;
+                font-size: 28px;
+                padding: 7px 8px;
                 letter-spacing: 3px;
             }
 
@@ -451,6 +480,8 @@
                 line-height: 1.35;
             }
         }
+
+
     </style>
 </head>
 
