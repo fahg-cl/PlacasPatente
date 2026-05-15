@@ -1,8 +1,188 @@
 {
   "periodo": "2026-05",
-  "totalRegistros": 64,
-  "fechaActualizacion": "2026-05-14T20:23:16.022Z",
+  "totalRegistros": 82,
+  "fechaActualizacion": "2026-05-15T20:54:15.877Z",
   "registros": [
+    {
+      "id": "0400ed7a-8cb8-412b-b3de-31381fb122c9",
+      "patente": "TDRG41",
+      "fechaHoraISO": "2026-05-15T19:35:48.353Z",
+      "fechaHoraLocal": "15-05-2026, 3:35:48 p.m.",
+      "latitud": -33.44374010084914,
+      "longitud": -70.65003432256913,
+      "precision": 1414,
+      "ubicacionDisponible": true
+    },
+    {
+      "id": "32d28d6e-cd96-42b9-bf44-4fd4d03e7baa",
+      "patente": "TDRG41",
+      "fechaHoraISO": "2026-05-15T19:35:45.379Z",
+      "fechaHoraLocal": "15-05-2026, 3:35:45 p.m.",
+      "latitud": -33.44373936169827,
+      "longitud": -70.65002134513814,
+      "precision": 1414,
+      "ubicacionDisponible": true
+    },
+    {
+      "id": "959742d6-6f7d-4c2f-9997-185ef17a124d",
+      "patente": "IDRG41",
+      "fechaHoraISO": "2026-05-15T19:35:39.349Z",
+      "fechaHoraLocal": "15-05-2026, 3:35:39 p.m.",
+      "latitud": -33.44373786663058,
+      "longitud": -70.64999509591283,
+      "precision": 1420.954847289407,
+      "ubicacionDisponible": true
+    },
+    {
+      "id": "1a03ed0d-a4d0-4c13-a641-cea03cb414a8",
+      "patente": "BKBB10",
+      "fechaHoraISO": "2026-05-15T19:35:18.278Z",
+      "fechaHoraLocal": "15-05-2026, 3:35:18 p.m.",
+      "latitud": -33.44373786663057,
+      "longitud": -70.64999509591281,
+      "precision": 1413.9999999999998,
+      "ubicacionDisponible": true
+    },
+    {
+      "id": "17fe8071-7d60-4f17-b362-f832752a3dff",
+      "patente": "HKBB10",
+      "fechaHoraISO": "2026-05-15T19:35:15.278Z",
+      "fechaHoraLocal": "15-05-2026, 3:35:15 p.m.",
+      "latitud": -33.443737822837406,
+      "longitud": -70.64999432702669,
+      "precision": 1414,
+      "ubicacionDisponible": true
+    },
+    {
+      "id": "deb7a178-a4bf-448f-8d63-4cc89583273a",
+      "patente": "TORP20",
+      "fechaHoraISO": "2026-05-15T19:35:12.365Z",
+      "fechaHoraLocal": "15-05-2026, 3:35:12 p.m.",
+      "latitud": -33.44373765508226,
+      "longitud": -70.6499913817135,
+      "precision": 1414,
+      "ubicacionDisponible": true
+    },
+    {
+      "id": "26a1744f-23e6-4378-8c6a-10663e7be61c",
+      "patente": "ETGP20",
+      "fechaHoraISO": "2026-05-15T19:35:06.633Z",
+      "fechaHoraLocal": "15-05-2026, 3:35:06 p.m.",
+      "latitud": -33.44373443697168,
+      "longitud": -70.64993488065335,
+      "precision": 1414,
+      "ubicacionDisponible": true
+    },
+    {
+      "id": "3bc0c9b9-4e6f-45dc-91e9-7b77bc445c38",
+      "patente": "ICRZ53",
+      "fechaHoraISO": "2026-05-15T19:34:57.306Z",
+      "fechaHoraLocal": "15-05-2026, 3:34:57 p.m.",
+      "latitud": -33.44372764449783,
+      "longitud": -70.6498156237275,
+      "precision": 1413.9996284464369,
+      "ubicacionDisponible": true
+    },
+    {
+      "id": "89f6b742-5796-4294-b84b-46f5316a758a",
+      "patente": "PTCL21",
+      "fechaHoraISO": "2026-05-15T19:34:51.288Z",
+      "fechaHoraLocal": "15-05-2026, 3:34:51 p.m.",
+      "latitud": -33.44372761359807,
+      "longitud": -70.6498150812138,
+      "precision": 1413.999626704274,
+      "ubicacionDisponible": true
+    },
+    {
+      "id": "8726e018-2570-437b-96ec-515c67a3354f",
+      "patente": "PTCL21",
+      "fechaHoraISO": "2026-05-15T19:34:48.103Z",
+      "fechaHoraLocal": "15-05-2026, 3:34:48 p.m.",
+      "latitud": -33.44372721480114,
+      "longitud": -70.64980807945025,
+      "precision": 1413.9996038539828,
+      "ubicacionDisponible": true
+    },
+    {
+      "id": "00083a5b-d675-4f71-a0c9-f12cc78003ca",
+      "patente": "EDFF08",
+      "fechaHoraISO": "2026-05-14T22:42:49.018Z",
+      "fechaHoraLocal": "14-05-2026, 6:42:49 p.m.",
+      "latitud": -33.365292370755554,
+      "longitud": -70.67027592537569,
+      "precision": 2.9649520910421137,
+      "ubicacionDisponible": true
+    },
+    {
+      "id": "931abdbb-b30b-4b64-8c0e-2233892d904e",
+      "patente": "EJ1763",
+      "fechaHoraISO": "2026-05-14T22:42:00.782Z",
+      "fechaHoraLocal": "14-05-2026, 6:42:00 p.m.",
+      "latitud": -33.36560114914775,
+      "longitud": -70.670272063072,
+      "precision": 2.4543697859051092,
+      "ubicacionDisponible": true
+    },
+    {
+      "id": "15ec5bbe-c6ac-4d13-a137-f8e8624c875a",
+      "patente": "GGCL46",
+      "fechaHoraISO": "2026-05-14T22:40:24.631Z",
+      "fechaHoraLocal": "14-05-2026, 6:40:24 p.m.",
+      "latitud": -33.371677677050656,
+      "longitud": -70.67104379305736,
+      "precision": 2.645975018783302,
+      "ubicacionDisponible": true
+    },
+    {
+      "id": "67583257-efcb-415b-9353-64efc0e40ac1",
+      "patente": "LLMY75",
+      "fechaHoraISO": "2026-05-14T22:25:23.453Z",
+      "fechaHoraLocal": "14-05-2026, 6:25:23 p.m.",
+      "latitud": -33.40886814023275,
+      "longitud": -70.64328435695815,
+      "precision": 7.999999983313972,
+      "ubicacionDisponible": true
+    },
+    {
+      "id": "8fd2c439-2715-45fa-89a6-0348b8d2cff8",
+      "patente": "BWKG81",
+      "fechaHoraISO": "2026-05-14T22:12:09.359Z",
+      "fechaHoraLocal": "14-05-2026, 6:12:09 p.m.",
+      "latitud": -33.43862744382803,
+      "longitud": -70.64259411244664,
+      "precision": 7.999999954426747,
+      "ubicacionDisponible": true
+    },
+    {
+      "id": "5aee3993-025f-4c1c-a777-ab64ee901c66",
+      "patente": "GWKG81",
+      "fechaHoraISO": "2026-05-14T22:12:06.368Z",
+      "fechaHoraLocal": "14-05-2026, 6:12:06 p.m.",
+      "latitud": -33.43863579490162,
+      "longitud": -70.64256959149836,
+      "precision": 7.999999860416063,
+      "ubicacionDisponible": true
+    },
+    {
+      "id": "bd62ebea-4811-4426-a831-e6c46cc8a522",
+      "patente": "FCPS76",
+      "fechaHoraISO": "2026-05-14T22:07:40.097Z",
+      "fechaHoraLocal": "14-05-2026, 6:07:40 p.m.",
+      "latitud": -33.44353330186902,
+      "longitud": -70.64593741277938,
+      "precision": 8.160654214097137,
+      "ubicacionDisponible": true
+    },
+    {
+      "id": "12de373b-4ee8-4d59-9a49-328866fe4415",
+      "patente": "FCPS76",
+      "fechaHoraISO": "2026-05-14T22:07:34.056Z",
+      "fechaHoraLocal": "14-05-2026, 6:07:34 p.m.",
+      "latitud": -33.44353330186902,
+      "longitud": -70.64593741277938,
+      "precision": 8.160654214097137,
+      "ubicacionDisponible": true
+    },
     {
       "id": "57164d62-2428-4108-837b-a6be82e0aeab",
       "patente": "GKSB78",
