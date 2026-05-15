@@ -341,88 +341,88 @@
 
         @media screen and (orientation: landscape) and (max-height: 500px) {
 
-            .app-header {
-                height: 44px;
-            }
-
             main {
                 padding: 4px;
+            }
+
+            .app-header {
+                height: 44px;
             }
 
             #pagina1.activa {
                 display: grid;
                 grid-template-columns: 38% 30% 32%;
+                grid-template-rows: auto auto auto;
                 gap: 6px;
                 align-items: start;
             }
 
             #pagina1 video {
                 grid-column: 1;
+                grid-row: 1 / span 3;
                 width: 100%;
                 max-width: none;
-                max-height: calc(100vh - 60px);
-                height: calc(100vh - 70px);
+                height: calc(100vh - 58px);
+                max-height: none;
             }
 
-            .zoom-controls {
+            #pagina1 .zoom-controls {
                 grid-column: 1;
+                grid-row: 3;
+                align-self: end;
+                z-index: 2;
+                margin: 0 6px 6px;
                 display: grid;
                 grid-template-columns: repeat(4, 1fr);
-                margin: 4px 0;
             }
 
             #resultado {
                 grid-column: 2;
-                margin: 0 0 6px 0;
+                grid-row: 1;
                 max-width: none;
+                margin: 0;
             }
 
-            .preview-container {
+            #pagina1 .preview-container {
                 grid-column: 2;
+                grid-row: 2 / span 2;
+                display: flex;
                 flex-direction: column;
                 gap: 6px;
+                margin: 0;
             }
 
-            .preview-box {
+            #pagina1 .preview-box {
                 padding: 6px;
             }
 
-                .preview-box h3 {
+                #pagina1 .preview-box h3 {
                     margin: 2px 0 4px;
                     font-size: 11px;
                 }
 
-                .preview-box canvas {
+                #pagina1 .preview-box canvas {
                     max-width: 100%;
-                    max-height: 72px;
+                    max-height: 82px;
                 }
 
             #pagina1 .panel {
                 grid-column: 3;
-                margin: 0 0 6px 0;
+                grid-row: 1;
+                margin: 0;
                 padding: 8px;
             }
 
-            .placa-patente {
-                width: 170px;
-                font-size: 26px;
-                padding: 6px 8px;
-                letter-spacing: 3px;
-            }
-
-            .datos-referencia {
-                font-size: 10px;
-            }
-
-            .control-grid {
+            #pagina1 .control-grid {
                 grid-column: 3;
+                grid-row: 2 / span 2;
                 margin: 0;
                 gap: 6px;
             }
 
-                .control-grid button,
-                .interval-card {
-                    min-height: 70px;
+                #pagina1 .control-grid button,
+                #pagina1 .interval-card {
+                    min-height: 68px;
                     border-radius: 16px;
                 }
 
@@ -439,51 +439,18 @@
                 font-size: 10px;
             }
 
-            #pagina2.activa {
-                height: calc(100vh - 54px);
+            .placa-patente {
+                width: 160px;
+                font-size: 24px;
+                padding: 6px 8px;
+                letter-spacing: 3px;
             }
 
-            #pagina2 h2 {
-                display: none;
-            }
-
-            #pagina2 .panel {
-                height: calc(100vh - 60px);
-                margin: 0;
-                padding: 4px;
-            }
-
-            #mapaPatentes {
-                height: 100%;
-            }
-
-            #pagina3.activa {
-                display: grid;
-                grid-template-columns: 35% 65%;
-                gap: 8px;
-            }
-
-            #pagina3 h2 {
-                display: none;
-            }
-
-            #estado,
-            #pagina3 .control-grid,
-            #pagina3 .panel:last-child {
-                margin-top: 0;
-            }
-
-            #pagina3 .control-grid {
-                grid-column: 1;
-            }
-
-            #pagina3 .panel {
-                grid-column: 2;
-                max-height: calc(100vh - 70px);
-                overflow-y: auto;
+            .datos-referencia {
+                font-size: 10px;
+                line-height: 1.35;
             }
         }
-
     </style>
 </head>
 
