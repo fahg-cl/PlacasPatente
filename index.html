@@ -321,6 +321,23 @@
     line-height: 1.5;
     text-align: center;
 }
+
+        .zoom-controls {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin: 10px 0;
+        }
+
+            .zoom-controls button {
+                width: 60px;
+                height: 42px;
+                border-radius: 12px;
+                border: 1px solid #26313a;
+                background: #12181e;
+                color: white;
+            }
+
     </style>
 </head>
 
@@ -345,6 +362,15 @@
             <h2>Lector de Patentes</h2>
 
             <video id="video" autoplay playsinline></video>
+
+            <div class="zoom-controls">
+
+                <button onclick="cambiarZoom(1)">1x</button>
+                <button onclick="cambiarZoom(2)">2x</button>
+                <button onclick="cambiarZoom(3)">3x</button>
+                <button onclick="cambiarZoom(4)">4x</button>
+
+            </div>
 
             <div id="resultado">Resultado...</div>
 
@@ -383,23 +409,23 @@
                 </button>
 
 
-            
 
-<div class="interval-card">
-    <div class="btn-icon">⏱️</div>
-    <div class="btn-text">Intervalo</div>
 
-    <select id="intervaloCaptura">
-        <option value="3000">Cada 3 seg.</option>
-        <option value="5000">Cada 5 seg.</option>
-        <option value="10000">Cada 10 seg.</option>
-        <option value="15000">Cada 15 seg.</option>
-        <option value="20000">Cada 20 seg.</option>
-        <option value="30000">Cada 30 seg.</option>
-        <option value="60000">Cada 60 seg.</option>
-    </select>
-</div>
-</div>
+                <div class="interval-card">
+                    <div class="btn-icon">⏱️</div>
+                    <div class="btn-text">Intervalo</div>
+
+                    <select id="intervaloCaptura">
+                        <option value="3000">Cada 3 seg.</option>
+                        <option value="5000">Cada 5 seg.</option>
+                        <option value="10000">Cada 10 seg.</option>
+                        <option value="15000">Cada 15 seg.</option>
+                        <option value="20000">Cada 20 seg.</option>
+                        <option value="30000">Cada 30 seg.</option>
+                        <option value="60000">Cada 60 seg.</option>
+                    </select>
+                </div>
+            </div>
         </section>
 
         <!-- PAGINA 2 -->
@@ -477,6 +503,9 @@
     let streamCamara = null;
     const btnCamara = document.getElementById("btnCamara");
 
+    let videoTrack = null;
+    let zoomActual = 1;
+
     actualizarHistorial();
     cargarModelo();
 
@@ -534,16 +563,55 @@
         }
     }
 
+    async function cambiarZoom(valorZoom) {
+
+        if (!videoTrack) {
+            resultado.innerText = "Cámara no activa.";
+            return;
+        }
+
+        const capabilities = videoTrack.getCapabilities();
+
+        if (!capabilities.zoom) {
+            resultado.innerText = "Zoom no soportado.";
+            return;
+        }
+
+        try {
+
+            zoomActual = valorZoom;
+
+            await videoTrack.applyConstraints({
+                advanced: [
+                    {
+                        zoom: valorZoom
+                    }
+                ]
+            });
+
+            resultado.innerText = `Zoom ${valorZoom.toFixed(1)}x`;
+
+        } catch (error) {
+
+            console.error("Error zoom:", error);
+
+            resultado.innerText = "Error ajustando zoom.";
+        }
+    }
+
+
     async function iniciarCamara() {
         try {
             streamCamara = await navigator.mediaDevices.getUserMedia({
                 video: {
                     facingMode: "environment",
-                    width: { ideal: 1280 },
-                    height: { ideal: 720 }
+                    width: { ideal: 1920 },
+                    height: { ideal: 1080 }
                 },
                 audio: false
             });
+
+            videoTrack = streamCamara.getVideoTracks()[0];
 
             video.srcObject = streamCamara;
             resultado.innerText = "Cámara activa.";
