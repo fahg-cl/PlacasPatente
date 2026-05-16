@@ -1,8 +1,78 @@
 {
   "periodo": "2026-05",
-  "totalRegistros": 160,
-  "fechaActualizacion": "2026-05-15T22:41:29.526Z",
+  "totalRegistros": 167,
+  "fechaActualizacion": "2026-05-16T02:47:19.236Z",
   "registros": [
+    {
+      "id": "49aa2644-6da6-402d-9b82-36bba6b8bcf4",
+      "patente": "TDRG41",
+      "fechaHoraISO": "2026-05-16T02:25:47.454Z",
+      "fechaHoraLocal": "15-05-2026, 10:25:47 p.m.",
+      "latitud": -33.35789728987801,
+      "longitud": -70.67825561132311,
+      "precision": 7.71384336338407,
+      "ubicacionDisponible": true
+    },
+    {
+      "id": "782ddff7-a68f-4c49-86a8-324ad24417c6",
+      "patente": "HEIA75",
+      "fechaHoraISO": "2026-05-16T02:25:20.589Z",
+      "fechaHoraLocal": "15-05-2026, 10:25:20 p.m.",
+      "latitud": -33.35789729509241,
+      "longitud": -70.67825561821296,
+      "precision": 8.265836985826018,
+      "ubicacionDisponible": true
+    },
+    {
+      "id": "cd1a19b0-0a62-493c-b64e-c7f7705354a7",
+      "patente": "NRRR00",
+      "fechaHoraISO": "2026-05-16T02:24:56.472Z",
+      "fechaHoraLocal": "15-05-2026, 10:24:56 p.m.",
+      "latitud": -33.35789727002582,
+      "longitud": -70.67825558509209,
+      "precision": 9.059965343728496,
+      "ubicacionDisponible": true
+    },
+    {
+      "id": "ab8794f8-38f4-48f3-9199-111c89b2524c",
+      "patente": "BBNE40",
+      "fechaHoraISO": "2026-05-16T02:24:53.500Z",
+      "fechaHoraLocal": "15-05-2026, 10:24:53 p.m.",
+      "latitud": -33.35789727260418,
+      "longitud": -70.6782555884989,
+      "precision": 10.133435686690467,
+      "ubicacionDisponible": true
+    },
+    {
+      "id": "2ca53f78-f99c-42cc-b403-74d7a36253ff",
+      "patente": "BBCL34",
+      "fechaHoraISO": "2026-05-16T02:24:47.486Z",
+      "fechaHoraLocal": "15-05-2026, 10:24:47 p.m.",
+      "latitud": -33.357903351461296,
+      "longitud": -70.67821361027191,
+      "precision": 11.103685089897368,
+      "ubicacionDisponible": true
+    },
+    {
+      "id": "4da4b046-d426-40d8-a073-864b6841f7b5",
+      "patente": "INGX83",
+      "fechaHoraISO": "2026-05-16T02:24:38.584Z",
+      "fechaHoraLocal": "15-05-2026, 10:24:38 p.m.",
+      "latitud": -33.357903351461296,
+      "longitud": -70.67821361027191,
+      "precision": 11.103685089897368,
+      "ubicacionDisponible": true
+    },
+    {
+      "id": "02267c54-05d8-4ed9-8161-d61e4bedc554",
+      "patente": "GKSB78",
+      "fechaHoraISO": "2026-05-16T02:24:20.163Z",
+      "fechaHoraLocal": "15-05-2026, 10:24:20 p.m.",
+      "latitud": -33.357903351461296,
+      "longitud": -70.67821361027191,
+      "precision": 11.103685089897368,
+      "ubicacionDisponible": true
+    },
     {
       "id": "0fcffcb4-8be3-4d83-867f-b6236cb1c08c",
       "patente": "DZBK49",
