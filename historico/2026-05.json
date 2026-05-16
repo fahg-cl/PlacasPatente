@@ -1,7 +1,7 @@
 {
   "periodo": "2026-05",
-  "totalRegistros": 228,
-  "fechaActualizacion": "2026-05-16T19:36:00.683Z",
+  "totalRegistros": 230,
+  "fechaActualizacion": "2026-05-16T19:36:21.254Z",
   "registros": [
     {
       "id": "82b7573e-a700-46c1-9334-cc89adec9106",
@@ -398,6 +398,26 @@
       "patente": "SFBB83",
       "fechaHoraISO": "2026-05-16T17:55:19.731Z",
       "fechaHoraLocal": "16-05-2026, 1:55:19 p.m.",
+      "latitud": -33.357903351461296,
+      "longitud": -70.67821361027191,
+      "precision": 11.103685089897368,
+      "ubicacionDisponible": true
+    },
+    {
+      "id": "abbb0bc2-9062-4c27-ac36-ed064ae66d1f",
+      "patente": "DTRC78",
+      "fechaHoraISO": "2026-05-16T02:50:50.657Z",
+      "fechaHoraLocal": "15-05-2026, 10:50:50 p.m.",
+      "latitud": -33.35789731742726,
+      "longitud": -70.67825564772437,
+      "precision": 10.656802397984064,
+      "ubicacionDisponible": true
+    },
+    {
+      "id": "ef8b6df4-acc7-47b9-8a7d-c3c3c9c138b3",
+      "patente": "FKSB78",
+      "fechaHoraISO": "2026-05-16T02:50:44.372Z",
+      "fechaHoraLocal": "15-05-2026, 10:50:44 p.m.",
       "latitud": -33.357903351461296,
       "longitud": -70.67821361027191,
       "precision": 11.103685089897368,
