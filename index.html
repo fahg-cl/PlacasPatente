@@ -566,6 +566,7 @@
                 <div class="preview-box">
                     <h3>Recorte patente</h3>
                     <canvas id="canvasRecorte"></canvas>
+                    <canvas id="canvasOCR" style="display:none;"></canvas>
                 </div>
             </div>
 
@@ -645,7 +646,7 @@
             </div>
             <div class="panel">
                 <h3>Versión</h3>
-                <div>3.3</div>
+                <div>3.4</div>
             </div>
         </section>
 
@@ -663,6 +664,7 @@
     const canvasModelo = document.getElementById("canvasModelo");
     const canvasPreview = document.getElementById("canvasPreview");
     const canvasRecorte = document.getElementById("canvasRecorte");
+    const canvasOCR = document.getElementById("canvasOCR");
 
     const estado = document.getElementById("estado");
     const resultado = document.getElementById("resultado");
@@ -787,14 +789,43 @@
         try {
             streamCamara = await navigator.mediaDevices.getUserMedia({
                 video: {
-                    facingMode: "environment",
-                    width: { ideal: 1920 },
-                    height: { ideal: 1080 }
-                },
-                audio: false
+                        facingMode: {
+                            ideal: "environment"
+                        },
+
+                        width: {
+                            ideal: 1920
+                        },
+
+                        height: {
+                            ideal: 1080
+                        }   
+                    }
+             audio: false
             });
 
             videoTrack = streamCamara.getVideoTracks()[0];
+
+            const capabilities = videoTrack.getCapabilities();
+
+            if (capabilities.zoom) {
+
+                const zoomInicial =
+                    Math.min(
+                        2,
+                        capabilities.zoom.max
+                    );
+
+                await videoTrack.applyConstraints({
+                    advanced: [
+                        {
+                            zoom: zoomInicial
+                        }
+                    ]
+                });
+
+                zoomActual = zoomInicial;
+            }
 
             video.srcObject = streamCamara;
             resultado.innerText = "Cámara activa.";
@@ -863,7 +894,7 @@
 
         try {
             const lectura = await Tesseract.recognize(
-                canvasRecorte.toDataURL("image/png"),
+                canvasOCR.toDataURL("image/png"),
                 "eng",
                 {
                     tessedit_char_whitelist: "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
@@ -984,34 +1015,78 @@
         );
     }
 
-    function recortarPatente(canvas, rect) {
-        const margen = 16;
+  function recortarPatente(canvas, rect) {
 
-        const x = Math.max(rect.x - margen, 0);
-        const y = Math.max(rect.y - margen, 0);
-        const width = Math.min(rect.width + margen * 2, canvas.width - x);
-        const height = Math.min(rect.height + margen * 2, canvas.height - y);
+    const margen = 18;
 
-        canvasRecorte.width = width;
-        canvasRecorte.height = height;
+    const x =
+        Math.max(rect.x - margen, 0);
 
-        const ctx = canvasRecorte.getContext("2d");
+    const y =
+        Math.max(rect.y - margen, 0);
 
-        ctx.drawImage(
-            canvas,
-            x,
-            y,
-            width,
-            height,
-            0,
-            0,
-            width,
-            height
+    const width =
+        Math.min(
+            rect.width + margen * 2,
+            canvas.width - x
         );
 
-        mejorarImagenOCR(ctx, width, height);
-    }
+    const height =
+        Math.min(
+            rect.height + margen * 2,
+            canvas.height - y
+        );
 
+    //
+    // CANVAS VISUAL
+    //
+
+    canvasRecorte.width = width;
+    canvasRecorte.height = height;
+
+    const ctxPreview =
+        canvasRecorte.getContext("2d");
+
+    ctxPreview.drawImage(
+        canvas,
+        x,
+        y,
+        width,
+        height,
+        0,
+        0,
+        width,
+        height
+    );
+
+    //
+    // CANVAS OCR ORIGINAL
+    //
+
+    canvasOCR.width = width;
+    canvasOCR.height = height;
+
+    const ctxOCR =
+        canvasOCR.getContext("2d");
+
+    ctxOCR.drawImage(
+        canvas,
+        x,
+        y,
+        width,
+        height,
+        0,
+        0,
+        width,
+        height
+    );
+
+    mejorarImagenOCR(
+        ctxPreview,
+        width,
+        height
+    );
+}
     function mejorarImagenOCR(ctx, width, height) {
         const imageData = ctx.getImageData(0, 0, width, height);
         const data = imageData.data;
