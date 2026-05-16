@@ -784,64 +784,56 @@
         }
     }
 
+async function iniciarCamara() {
+    try {
+        streamCamara = await navigator.mediaDevices.getUserMedia({
+            video: {
+                facingMode: {
+                    ideal: "environment"
+                },
+                width: {
+                    ideal: 1920
+                },
+                height: {
+                    ideal: 1080
+                }
+            },
+            audio: false
+        });
 
-    async function iniciarCamara() {
-        try {
-            streamCamara = await navigator.mediaDevices.getUserMedia({
-                video: {
-                        facingMode: {
-                            ideal: "environment"
-                        },
+        videoTrack = streamCamara.getVideoTracks()[0];
 
-                        width: {
-                            ideal: 1920
-                        },
+        const capabilities = videoTrack.getCapabilities();
 
-                        height: {
-                            ideal: 1080
-                        }   
+        if (capabilities.zoom) {
+            const zoomInicial = Math.min(2, capabilities.zoom.max);
+
+            await videoTrack.applyConstraints({
+                advanced: [
+                    {
+                        zoom: zoomInicial
                     }
-             audio: false
+                ]
             });
 
-            videoTrack = streamCamara.getVideoTracks()[0];
-
-            const capabilities = videoTrack.getCapabilities();
-
-            if (capabilities.zoom) {
-
-                const zoomInicial =
-                    Math.min(
-                        2,
-                        capabilities.zoom.max
-                    );
-
-                await videoTrack.applyConstraints({
-                    advanced: [
-                        {
-                            zoom: zoomInicial
-                        }
-                    ]
-                });
-
-                zoomActual = zoomInicial;
-            }
-
-            video.srcObject = streamCamara;
-            resultado.innerText = "Cámara activa.";
-
-            btnCamara.innerHTML = `
-                <div class="btn-icon">⏹️</div>
-                <div class="btn-text">Desactivar cámara</div>
-            `;
-            btnCamara.classList.add("auto-activo");
-
-        } catch (error) {
-            resultado.innerText = "Error al activar cámara.";
-            console.error("Error cámara:", error);
+            zoomActual = zoomInicial;
         }
-    }
 
+        video.srcObject = streamCamara;
+        resultado.innerText = "Cámara activa.";
+
+        btnCamara.innerHTML = `
+            <div class="btn-icon">⏹️</div>
+            <div class="btn-text">Desactivar cámara</div>
+        `;
+        btnCamara.classList.add("auto-activo");
+
+    } catch (error) {
+        resultado.innerText = "Error al activar cámara.";
+        console.error("Error cámara:", error);
+    }
+}
+    
     function detenerCamara() {
         if (capturaAutomaticaTimer) {
             detenerCapturaAutomatica();
